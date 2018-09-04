@@ -5,15 +5,19 @@
   
 
   
-  <title>Hexo</title>
+  <title>利用柯里化去除重复代码 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://yoursite.com/index.html">
+  <meta name="description" content="Swift中，函数是一等公民问题最近因为某个OC类中有重复代码，在重构之后，虽然原来的重复代码去掉了，但又有如下样式的代码，其实还是有重复，如files和dirs的获取，以及对结果的处理，代码是完全一样的。 123456789101112131415161718192021222324252627282930313233extension Array where Element: WeiyunIt">
+<meta property="og:type" content="article">
+<meta property="og:title" content="利用柯里化去除重复代码">
+<meta property="og:url" content="http://yoursite.com/2018/09/04/curry-cleancode/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Swift中，函数是一等公民问题最近因为某个OC类中有重复代码，在重构之后，虽然原来的重复代码去掉了，但又有如下样式的代码，其实还是有重复，如files和dirs的获取，以及对结果的处理，代码是完全一样的。 123456789101112131415161718192021222324252627282930313233extension Array where Element: WeiyunIt">
 <meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-09-04T11:59:11.581Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hexo">
+<meta name="twitter:title" content="利用柯里化去除重复代码">
+<meta name="twitter:description" content="Swift中，函数是一等公民问题最近因为某个OC类中有重复代码，在重构之后，虽然原来的重复代码去掉了，但又有如下样式的代码，其实还是有重复，如files和dirs的获取，以及对结果的处理，代码是完全一样的。 123456789101112131415161718192021222324252627282930313233extension Array where Element: WeiyunIt">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -60,9 +64,7 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-    <article id="post-curry-cleancode" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-curry-cleancode" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/09/04/curry-cleancode/" class="article-date">
   <time datetime="2018-09-04T11:58:01.000Z" itemprop="datePublished">2018-09-04</time>
@@ -75,8 +77,8 @@
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/09/04/curry-cleancode/">利用柯里化去除重复代码</a>
+    <h1 class="article-title" itemprop="name">
+      利用柯里化去除重复代码
     </h1>
   
 
@@ -118,11 +120,9 @@
     </footer>
   </div>
   
-</article>
-
-
+    
   
-
+</article>
 
 </section>
         
