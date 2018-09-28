@@ -7,9 +7,7 @@ Tags: swift,curry,柯里化,重构,重复
 
 
 
-##### Swift中，函数是一等公民
-
-
+**Swift中，函数是一等公民**
 
 #### 问题
 
@@ -17,7 +15,7 @@ Tags: swift,curry,柯里化,重构,重复
 
 ```swift
 extension Array where Element: WeiyunItem {
-    fileprivate func restoreObser(dir: WeiyunDir?) -> Completable {
+    fileprivate func restore(dir: WeiyunDir?) -> Completable {
         let files = compactMap { $0 as? WeiyunFile }
         let dirs = compactMap { $0 as? WeiyunDir }
 
@@ -33,7 +31,7 @@ extension Array where Element: WeiyunItem {
         }
     }
 
-    fileprivate func deleteObser() -> Completable {
+    fileprivate func delete() -> Completable {
         let files = compactMap { $0 as? WeiyunFile }
         let dirs = compactMap { $0 as? WeiyunDir }
 
@@ -73,7 +71,7 @@ extension Array where Element: WeiyunItem {
         }
     }
 
-    fileprivate func restoreObser(dir: WeiyunDir?) -> Completable {
+    fileprivate func restore(dir: WeiyunDir?) -> Completable {
         let tuple = splitItems()
         return Completable.create { observer -> Disposable in
             WeiyunSDK.sharedInstance()?.restoreRecycleFile(tuple.0, dir: tuple.1, pdirkey: dir?.dirkey, ppdirkey: dir?.pdirkey, block: { _, _, err in
@@ -83,7 +81,7 @@ extension Array where Element: WeiyunItem {
         }
     }
 
-    fileprivate func deleteObser() -> Completable {
+    fileprivate func delete() -> Completable {
         let tuple = splitItems()
         return Completable.create { observer -> Disposable in
             WeiyunSDK.sharedInstance()?.clearRecycleFile(tuple.0, dir: tuple.1, block: { _, _, err in
@@ -113,7 +111,7 @@ extension Array where Element: WeiyunItem {
 
 如何把restoreRecycleFile和clearRecycleFile变为具有相同参数的函数，就是要解决的问题。
 
-今天的主角：柯里化，就是来解决这个问题的。
+今天的主角：**柯里化**，就是来解决这个问题的。
 
 
 
@@ -121,15 +119,15 @@ extension Array where Element: WeiyunItem {
 
 柯里化是一个通用的概念，在函数式编程里面非常重要。它在维基上的定义是：
 
-```
-把接受多个参数的函数变换成接受一个单一参数（最初函数的第一个参数）的函数，并且返回接受余下的参数而且返回结果的新函数的技术。
-```
+> 把接受多个参数的函数变换成接受一个单一参数（最初函数的第一个参数）的函数，并且返回接受余下的参数而且返回结果的新函数的技术。
+
+
 
 就作用来说，柯里化可以改变函数类型，可以提前绑定其中的参数。
 
 
 
-Github上有一些现成的柯里化开源库，可以直接拿来用的。如[Curry](https://github.com/thoughtbot/Curry)、[Prelude](https://github.com/robrix/Prelude)等
+Github上也有一些现成的柯里化开源库，可以直接用的。如[Curry](https://github.com/thoughtbot/Curry)、[Prelude](https://github.com/robrix/Prelude)等
 
 
 
@@ -168,17 +166,17 @@ private func curry2_3<A, B, C, D, E, F>(_ function: @escaping (A, B, C, D, E) ->
 
 ```swift
 fileprivate extension Array where Element: WeiyunItem {
-    func restoreObser(dir: WeiyunDir?) -> Completable {
+    func restore(dir: WeiyunDir?) -> Completable {
         let f = curry2_3(WeiyunSDK.sharedInstance().restoreRecycleFile)(dir?.dirkey, dir?.pdirkey)
-        return operateObser(f)
+        return operate(f)
     }
 
-    func deleteObser() -> Completable {
+    func delete() -> Completable {
         let f = WeiyunSDK.sharedInstance().clearRecycleFile
-        return operateObser(f)
+        return operate(f)
     }
 
-    private func operateObser(_ function: @escaping ([WeiyunFile]?, [WeiyunDir]?, RestoreRecycleItemBlock?) -> Void) -> Completable {
+    private func operate(_ function: @escaping ([WeiyunFile]?, [WeiyunDir]?, RestoreRecycleItemBlock?) -> Void) -> Completable {
         let files = compactMap { $0 as? WeiyunFile }
         let dirs = compactMap { $0 as? WeiyunDir }
 

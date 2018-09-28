@@ -126,26 +126,6 @@ let lst = ["1", "2", "3"]
 
 
 
-##### 操作符另外的调用方式
-
-​	<font color=gray size=2>*Swift*</font>
-
-```swift
-(+)(1, 2)	// 输出3
-```
-
-​	<font color=gray size=2>*Haskell*</font>
-
-```haskell
-(+) 1 2
-```
-
-
-
----
-
-
-
 ##### 函数定义
 
 ​	<font color=gray size=2>*Swift*</font>
@@ -183,6 +163,50 @@ myAdd a b = a + b
 
 
 ---
+
+
+
+##### 操作符另外的调用方式
+
+​	<font color=gray size=2>*Swift*</font>
+
+```swift
+(+)(1, 2)	// 输出3
+```
+
+​	<font color=gray size=2>*Haskell*</font>
+
+```haskell
+(+) 1 2
+```
+
+
+
+------
+
+
+
+##### 自定义操作符
+
+​	<font color=gray size=2>*Swift*</font>
+
+```swift
+infix operator <^> : AdditionPrecedence
+func <^>(lhs: Int, rhs: Int) -> Int { return lhs + rhs }
+5 <^> 6		// 11
+```
+
+​	<font color=gray size=2>*Haskell*</font>
+
+```haskell
+(<^>) :: Int -> Int -> Int
+a <^> b = a + b
+5 <^> 6		-- 11
+```
+
+
+
+------
 
 
 
