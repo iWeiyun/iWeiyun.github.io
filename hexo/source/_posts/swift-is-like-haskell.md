@@ -1,6 +1,7 @@
 ---
 title: Swift is like Haskell
 date: 2018-09-27 21:08:53
+author: matthew
 tags: haskell,swift,函数式
 ---
 
@@ -15,6 +16,10 @@ Swift是一门多泛式语言，而且参考了很多其它语言的实现，所
 前段时间看到一篇文章，[Swift is like Scala](<https://leverich.github.io/swiftislikescala/>)，里面做了Swift和Scala一些语法的对比，有些代码块语法上是很像的。最近又看到了[Swift is like Kotlin](<http://nilhcem.com/swift-is-like-kotlin/>)，[Swift is like Go](<http://repo.tiye.me/jiyinyiyong/swift-is-like-go/>)。感觉这些挺有趣的，最近刚好有了解一点Haskell，所以就有了这个想法来对比下相似点。
 
 这儿只是列出两门语言一些类似的点，或语法，或概念上的。但在真正使用的时候，差别还是巨大的。如果想了解真正的工程中，Haskell的使用，可以参考下 [Github Haskell Star排名](https://github.com/trending/haskell?since=weekly)等
+
+
+
+<!-- more -->
 
 
 

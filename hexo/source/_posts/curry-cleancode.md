@@ -13,6 +13,8 @@ Tags: swift,curry,柯里化,重构,重复
 
 最近因为某个类中有重复代码，在“固化思维”重构之后，虽然原来的重复代码去掉了，但又有如下样式的代码，仔细想想，其实还是有重复，如files和dirs的获取，以及对结果的处理，代码是完全一样的。
 
+<!-- more -->
+
 ```swift
 extension Array where Element: WeiyunItem {
     fileprivate func restore(dir: WeiyunDir?) -> Completable {
