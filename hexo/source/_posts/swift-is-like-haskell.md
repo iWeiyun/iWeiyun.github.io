@@ -126,6 +126,26 @@ let lst = ["1", "2", "3"]
 
 
 
+##### 区间
+
+​	<font color=gray size=2>*Swift*</font>
+
+```swift
+let lst = [1 ... 5]
+```
+
+​	<font color=gray size=2>*Haskell*</font>
+
+```haskell
+let lst = [1 .. 5]	-- [1, 2, 3, 4, 5]
+```
+
+
+
+------
+
+
+
 ##### 函数定义
 
 ​	<font color=gray size=2>*Swift*</font>
@@ -158,6 +178,28 @@ func myAdd<T: Numeric>(_ a: T, _ b: T) -> T { return a + b }
 
 ```haskell
 myAdd a b = a + b 
+```
+
+
+
+------
+
+
+
+##### 返回元组
+
+​	<font color=gray size=2>*Swift*</font>
+
+```swift
+func process(_ a: Int, _ b: Int) -> (Int, Int) {
+    return (a + b, a * b)
+}
+```
+
+​	<font color=gray size=2>*Haskell*</font>
+
+```haskell
+process a b = (a + b, a * b)
 ```
 
 
@@ -202,6 +244,26 @@ func <^>(lhs: Int, rhs: Int) -> Int { return lhs + rhs }
 (<^>) :: Int -> Int -> Int
 a <^> b = a + b
 5 <^> 6		-- 11
+```
+
+
+
+------
+
+
+
+##### Map
+
+​	<font color=gray size=2>*Swift*</font>
+
+```swift
+[1, 2, 3].map { $0 * 2}	// [2, 4, 6]
+```
+
+​	<font color=gray size=2>*Haskell*</font>
+
+```haskell
+map (*2) [1, 2, 3]		-- [2, 4, 6]
 ```
 
 
