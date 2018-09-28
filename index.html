@@ -340,7 +340,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2018-09-28 11:01:36" itemprop="dateModified" datetime="2018-09-28T11:01:36+08:00">2018-09-28</time>
+                <time title="Modified: 2018-09-28 13:03:32" itemprop="dateModified" datetime="2018-09-28T13:03:32+08:00">2018-09-28</time>
               
             
           </span>
@@ -404,6 +404,11 @@
 <p>​    <font color="gray" size="2"><em>Haskell</em></font></p>
 <figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">let</span> lst = [<span class="string">"1"</span>, <span class="string">"2"</span>, <span class="string">"3"</span>]</span><br></pre></td></tr></table></figure>
 <hr>
+<h5 id="区间"><a href="#区间" class="headerlink" title="区间"></a>区间</h5><p>​    <font color="gray" size="2"><em>Swift</em></font></p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> lst = [<span class="number">1</span> ... <span class="number">5</span>]</span><br></pre></td></tr></table></figure>
+<p>​    <font color="gray" size="2"><em>Haskell</em></font></p>
+<figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">let</span> lst = [<span class="number">1</span> .. <span class="number">5</span>]	<span class="comment">-- [1, 2, 3, 4, 5]</span></span><br></pre></td></tr></table></figure>
+<hr>
 <h5 id="函数定义"><a href="#函数定义" class="headerlink" title="函数定义"></a>函数定义</h5><p>​    <font color="gray" size="2"><em>Swift</em></font></p>
 <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">myAdd</span><span class="params">(<span class="number">_</span> a: Int, <span class="number">_</span> b: Int)</span></span> -&gt; <span class="type">Int</span> &#123; <span class="keyword">return</span> a + b &#125;</span><br></pre></td></tr></table></figure>
 <p>​    <font color="gray" size="2"><em>Haskell</em></font></p>
@@ -414,6 +419,11 @@
 <p>​    <font color="gray" size="2"><em>Haskell</em></font></p>
 <figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">myAdd</span> a b = a + b</span><br></pre></td></tr></table></figure>
 <hr>
+<h5 id="返回元组"><a href="#返回元组" class="headerlink" title="返回元组"></a>返回元组</h5><p>​    <font color="gray" size="2"><em>Swift</em></font></p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">process</span><span class="params">(<span class="number">_</span> a: Int, <span class="number">_</span> b: Int)</span></span> -&gt; (<span class="type">Int</span>, <span class="type">Int</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> (a + b, a * b)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>​    <font color="gray" size="2"><em>Haskell</em></font></p>
+<figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">process</span> a b = (a + b, a * b)</span><br></pre></td></tr></table></figure>
+<hr>
 <h5 id="操作符另外的调用方式"><a href="#操作符另外的调用方式" class="headerlink" title="操作符另外的调用方式"></a>操作符另外的调用方式</h5><p>​    <font color="gray" size="2"><em>Swift</em></font></p>
 <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(+)(<span class="number">1</span>, <span class="number">2</span>)	<span class="comment">// 输出3</span></span><br></pre></td></tr></table></figure>
 <p>​    <font color="gray" size="2"><em>Haskell</em></font></p>
@@ -423,6 +433,11 @@
 <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">infix</span> <span class="keyword">operator</span> &lt;^&gt; : <span class="type">AdditionPrecedence</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> &lt;^&gt;<span class="params">(lhs: Int, rhs: Int)</span></span> -&gt; <span class="type">Int</span> &#123; <span class="keyword">return</span> lhs + rhs &#125;</span><br><span class="line"><span class="number">5</span> &lt;^&gt; <span class="number">6</span>		<span class="comment">// 11</span></span><br></pre></td></tr></table></figure>
 <p>​    <font color="gray" size="2"><em>Haskell</em></font></p>
 <figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(&lt;^&gt;) :: <span class="type">Int</span> -&gt; <span class="type">Int</span> -&gt; <span class="type">Int</span></span><br><span class="line"><span class="title">a</span> &lt;^&gt; b = a + b</span><br><span class="line"><span class="number">5</span> &lt;^&gt; <span class="number">6</span>		<span class="comment">-- 11</span></span><br></pre></td></tr></table></figure>
+<hr>
+<h5 id="Map"><a href="#Map" class="headerlink" title="Map"></a>Map</h5><p>​    <font color="gray" size="2"><em>Swift</em></font></p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].<span class="built_in">map</span> &#123; $<span class="number">0</span> * <span class="number">2</span>&#125;	<span class="comment">// [2, 4, 6]</span></span><br></pre></td></tr></table></figure>
+<p>​    <font color="gray" size="2"><em>Haskell</em></font></p>
+<figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">map</span> (*<span class="number">2</span>) [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]		<span class="comment">-- [2, 4, 6]</span></span><br></pre></td></tr></table></figure>
 <hr>
 <h5 id="数据类型"><a href="#数据类型" class="headerlink" title="数据类型"></a>数据类型</h5><p>​    <font color="gray" size="2"><em>Swift</em></font></p>
 <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">struct</span> <span class="title">CGPoint</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">var</span> x: <span class="type">CGFloat</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">var</span> y: <span class="type">CGFloat</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
