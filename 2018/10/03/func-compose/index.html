@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next mist" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="前言函数组合，在函数式编程里面也是挺重要的概念，能够将函数进行操作合并等，在有些场景下可以大幅度提升代码的可读及可维护性。 下面就演示一些利用函数组合重构代码以达到更好可维护性的例子 简单场景假设有如下代码：  1234process1(_ param: String) -&amp;gt; Stringprocess2(_ param: String) -&amp;gt; Stringprocess3(_ par">
+<meta name="keywords" content="swift,函数式,函数组合,rxswift,promise">
+<meta property="og:type" content="article">
+<meta property="og:title" content="函数组合与RxSwift">
+<meta property="og:url" content="http://www.weiyun.com/2018/10/03/func-compose/index.html">
+<meta property="og:site_name" content="微云iOS团队">
+<meta property="og:description" content="前言函数组合，在函数式编程里面也是挺重要的概念，能够将函数进行操作合并等，在有些场景下可以大幅度提升代码的可读及可维护性。 下面就演示一些利用函数组合重构代码以达到更好可维护性的例子 简单场景假设有如下代码：  1234process1(_ param: String) -&amp;gt; Stringprocess2(_ param: String) -&amp;gt; Stringprocess3(_ par">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-10-03T14:25:37.529Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="函数组合与RxSwift">
+<meta name="twitter:description" content="前言函数组合，在函数式编程里面也是挺重要的概念，能够将函数进行操作合并等，在有些场景下可以大幅度提升代码的可读及可维护性。 下面就演示一些利用函数组合重构代码以达到更好可维护性的例子 简单场景假设有如下代码：  1234process1(_ param: String) -&amp;gt; Stringprocess2(_ param: String) -&amp;gt; Stringprocess3(_ par">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="微云iOS团队" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="http://www.weiyun.com/2018/10/03/func-compose/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>函数组合与RxSwift | 微云iOS团队</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">微云iOS团队</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.weiyun.com/2018/10/03/func-compose/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="All">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="微云iOS团队">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">函数组合与RxSwift
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2018-10-03 22:24:56 / Modified: 22:25:37" itemprop="dateCreated datePublished" datetime="2018-10-03T22:24:56+08:00">2018-10-03</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>函数组合，在函数式编程里面也是挺重要的概念，能够将函数进行操作合并等，在有些场景下可以大幅度提升代码的可读及可维护性。</p>
+<p>下面就演示一些利用函数组合重构代码以达到更好可维护性的例子</p>
+<h3 id="简单场景"><a href="#简单场景" class="headerlink" title="简单场景"></a>简单场景</h3><p>假设有如下代码： </p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">process1(<span class="number">_</span> param: <span class="type">String</span>) -&gt; <span class="type">String</span></span><br><span class="line">process2(<span class="number">_</span> param: <span class="type">String</span>) -&gt; <span class="type">String</span></span><br><span class="line">process3(<span class="number">_</span> param: <span class="type">String</span>) -&gt; <span class="type">String</span></span><br><span class="line">process4(<span class="number">_</span> param: <span class="type">String</span>) -&gt; <span class="type">String</span></span><br></pre></td></tr></table></figure>
+<p>这些函数来处理字符串，如果要组合调用的话，可能会写出来如下的代码：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> str = ... </span><br><span class="line">str = process1(str) </span><br><span class="line">str = process2(str) </span><br><span class="line">str = process3(str) </span><br><span class="line">str = process4(str) </span><br><span class="line"><span class="comment">// use str</span></span><br></pre></td></tr></table></figure>
+<p>或者更洒脱一些，写出如下的代码：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> ret = process4(process3(process2(process1(str))))</span><br></pre></td></tr></table></figure>
+<p>第二种方式可读性不算太好，第一种方式代码写起来又会非常繁琐。那应该如何来优化呢？</p>
+<h3 id="优化"><a href="#优化" class="headerlink" title="优化"></a>优化</h3><p>Swift中是支持<strong>自定义运算符</strong>的，而且swift中<strong>函数是一等公民</strong>。这两个特性是很强大的，利用他们，可以实现函数的组合，可以让代码看起来更简洁、更易读。</p>
+<p>大概的思路是把process1、process2等进行组合，组合成一个新的函数，调用这个新函数的效果，跟分开挨个调用是一样的。</p>
+<p>优化后的代码如下：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">infix</span> <span class="keyword">operator</span> ++ : <span class="type">AdditionPrecedence</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> ++ <span class="params">(lhs: @escaping <span class="params">(String)</span></span></span> -&gt; <span class="type">String</span>, rhs: @escaping (<span class="type">String</span>) -&gt; <span class="type">String</span>) -&gt; (<span class="type">String</span>) -&gt; <span class="type">String</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123; rhs(lhs($<span class="number">0</span>)) &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> ret = (process1 ++ process2 ++ process3 ++ process4)(str)</span><br></pre></td></tr></table></figure>
+<p>这样写出来的代码，易读且易维护，要增删操作、调整调用顺序等都是很容易的。</p>
+<h3 id="更多场景"><a href="#更多场景" class="headerlink" title="更多场景"></a>更多场景</h3><p>上面这种场景，是比较特殊的场景，函数签名一致并且是同步函数。在真正工作中更普遍的场景是：</p>
+<ol>
+<li>函数签名不一致，如process1(String)，process2(Int, String)</li>
+<li>函数是异步操作，而且回调的闭包类型也不一样等。</li>
+</ol>
+<h4 id="函数签名不一致"><a href="#函数签名不一致" class="headerlink" title="函数签名不一致"></a>函数签名不一致</h4><p>要能组合函数类型不一致的问题，可以参考：<a href="https://iweiyun.github.io/2018/09/04/curry-cleancode/" target="_blank" rel="noopener">利用柯里化去除重复代码</a>，利用柯里化 (严格来说叫partial function application) 可以很容易解决。</p>
+<p>代码示例如下：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">process1(<span class="number">_</span> param: <span class="type">String</span>) -&gt; <span class="type">String</span></span><br><span class="line">process2(<span class="number">_</span> i: <span class="type">Int</span>, <span class="number">_</span> param: <span class="type">String</span>) -&gt; <span class="type">String</span></span><br><span class="line">process3(<span class="number">_</span> i: <span class="type">Int</span>, <span class="number">_</span> param: <span class="type">String</span>) -&gt; <span class="type">String</span></span><br><span class="line">process4(<span class="number">_</span> i: <span class="type">Int</span>, <span class="number">_</span> param: <span class="type">String</span>) -&gt; <span class="type">String</span></span><br><span class="line"></span><br><span class="line">process1 ++ curry(process2) ++ curry(process3) ++ curry(process4)</span><br></pre></td></tr></table></figure>
+<p>不过这儿补充下，有柯里化，就有<strong>反柯里化</strong>。反柯里化就是给函数增加参数，让该函数跟其它函数类型对齐。</p>
+<p>反柯里化的一种简单实现如下：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">uncurry</span><span class="params">(function: @escaping <span class="params">(String)</span></span></span> -&gt; <span class="type">String</span>) -&gt; (<span class="type">String</span>, <span class="type">Int</span>) -&gt; <span class="type">String</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123; s, <span class="number">_</span> <span class="keyword">in</span> function(s) &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>利用该反柯里化方式，新的组合代码可以适度简化为这样：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">uncuryy(process1) ++ process2 ++ process3 ++ process4</span><br></pre></td></tr></table></figure>
+<p>uncurry完善的实现，可以参考Github上的一些实现，如 <a href="https://github.com/pointfreeco/swift-overture/blob/master/Sources/Overture/Uncurry.swift" target="_blank" rel="noopener">swift-overture</a></p>
+<h4 id="异步操作"><a href="#异步操作" class="headerlink" title="异步操作"></a>异步操作</h4><p>再来看异步操作的问题。</p>
+<p>说到异步处理，如果熟悉一些异步处理框架，如<a href="https://github.com/mxcl/PromiseKit" target="_blank" rel="noopener">PromiseKit</a>或<a href="https://github.com/ReactiveX/RxSwift" target="_blank" rel="noopener">RxSwift</a>，那么可能知道PromiseKit里的Promise或RxSwift里的Observable这两个对象。</p>
+<p>仔细想想，Promise和Observable本身就是很有意思的对象，这些对象可以封装异步操作，当然，也可以表示同步操作，表示纯数据等。这些对象本身也提供了很多操作，操作之后，返回的结果仍然是该对象类型。（在函数式编程里面，这两个对象都可以理解为<a href="http://www.ruanyifeng.com/blog/2015/07/monad.html" target="_blank" rel="noopener">Monad</a>对象）</p>
+<p>理解上面这一点是关键，如果Observable本身可以封装异步操作，那么，一个异步操作就可以表达为一个同步函数，只是返回对象是一个代表同步或异步的对象。这样异步的问题就转变为同步处理的问题了。</p>
+<p>下面继续举个简单的例子</p>
+<p>假设有如下4个异步操作：</p>
+<blockquote>
+<p>asyncProcess1<br>asyncProcess2_1<br>asyncProcess2_2<br>asyncProcess3</p>
+</blockquote>
+<p>1、2、3这几个是并发，2_1和2_2是串行</p>
+<p>用RxSwift写的传统代码大概如下：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">asyncProcess1(param: [<span class="type">String</span>]) -&gt; <span class="type">Observable</span>&lt;<span class="type">Ret</span>&gt; &#123;&#125;</span><br><span class="line">asyncProcess2_1(param1: <span class="type">Int</span>, param2: [<span class="type">String</span>]) -&gt; <span class="type">Observable</span>&lt;<span class="type">Ret</span>&gt; &#123;&#125;</span><br><span class="line">asyncProcess2_2(param: [<span class="type">String</span>]) -&gt; <span class="type">Observable</span>&lt;<span class="type">Ret</span>&gt; &#123;&#125;</span><br><span class="line">asyncProcess3(param: [<span class="type">String</span>]) -&gt; <span class="type">Observable</span>&lt;<span class="type">Ret</span>&gt; &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> process2 = <span class="type">Observable</span>.concat(asyncProcess2_1(value, strs), asyncProcess2_2(strs))</span><br><span class="line"><span class="keyword">let</span> process = <span class="type">Observable</span>.merge([asyncProcess1(strs), process2, asyncProcess3(strs)])</span><br><span class="line"><span class="comment">// some code</span></span><br></pre></td></tr></table></figure>
+<p>下面我们就尝试重构下该代码。</p>
+<p>先定义下通用的concat和merge的操作符：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 并发两个函数，合并成一个函数</span></span><br><span class="line"><span class="keyword">infix</span> <span class="keyword">operator</span> ||| : <span class="type">RxPrecedence</span></span><br><span class="line"><span class="comment">// 串行两个函数，合并成一个函数</span></span><br><span class="line"><span class="keyword">infix</span> <span class="keyword">operator</span> &gt;&gt;&gt; : <span class="type">RxPrecedence</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typealias</span> <span class="type">RxOper</span>&lt;<span class="type">T</span>, <span class="type">U</span>&gt; = (<span class="type">T</span>) -&gt; <span class="type">Observable</span>&lt;<span class="type">U</span>&gt;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> ||| &lt;T, U&gt;<span class="params">(lfun: @escaping RxOper&lt;T, U&gt;, rfun: @escaping RxOper&lt;T, U&gt;)</span></span> -&gt; <span class="type">RxOper</span>&lt;<span class="type">T</span>, <span class="type">U</span>&gt; &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123; value <span class="keyword">in</span></span><br><span class="line">        <span class="type">Observable</span>.merge([lfun(value), rfun(value)])</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> &gt;&gt;&gt; &lt;T, U&gt;<span class="params">(lfun: @escaping RxOper&lt;T, U&gt;, rfun: @escaping RxOper&lt;T, U&gt;)</span></span> -&gt; <span class="type">RxOper</span>&lt;<span class="type">T</span>, <span class="type">U</span>&gt; &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123; value <span class="keyword">in</span></span><br><span class="line">        lfun(value).concat(rfun(value))</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后写相应的业务代码：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 新的处理代码</span></span><br><span class="line"><span class="keyword">let</span> process = asyncProcess1 ||| (curry(asyncProcess2_1)(value) &gt;&gt;&gt; asyncProcess2_2) ||| asyncProcess3</span><br><span class="line"><span class="comment">// process(strs)...</span></span><br></pre></td></tr></table></figure>
+<p>新代码的优势一目了然。并且这些例子都是拿的非常简单的示例来讲解的，真正的使用场景上，当操作数量逐渐增加，操作逻辑逐渐复杂时，传统的代码写法的冗余就越能显现。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/swift-函数式-函数组合-rxswift-promise/" rel="tag"># swift,函数式,函数组合,rxswift,promise</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/27/swift-is-like-haskell/" rel="next" title="Swift is like Haskell">
+                <i class="fa fa-chevron-left"></i> Swift is like Haskell
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">All</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#简单场景"><span class="nav-number">2.</span> <span class="nav-text">简单场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#优化"><span class="nav-number">3.</span> <span class="nav-text">优化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#更多场景"><span class="nav-number">4.</span> <span class="nav-text">更多场景</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#函数签名不一致"><span class="nav-number">4.1.</span> <span class="nav-text">函数签名不一致</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#异步操作"><span class="nav-number">4.2.</span> <span class="nav-text">异步操作</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">All</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
