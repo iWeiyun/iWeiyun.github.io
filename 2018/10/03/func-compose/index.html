@@ -114,7 +114,7 @@
 <meta property="og:site_name" content="微云iOS团队">
 <meta property="og:description" content="前言函数组合，在函数式编程里面也是挺重要的概念，能够将函数进行操作合并等，在有些场景下可以大幅度提升代码的可读及可维护性。 下面就演示一些利用函数组合重构代码以达到更好可维护性的例子 简单场景假设有如下代码：  1234process1(_ param: String) -&amp;gt; Stringprocess2(_ param: String) -&amp;gt; Stringprocess3(_ par">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-10-03T14:35:18.287Z">
+<meta property="og:updated_time" content="2018-10-03T14:40:39.607Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="利用函数组合提升代码可维护性">
 <meta name="twitter:description" content="前言函数组合，在函数式编程里面也是挺重要的概念，能够将函数进行操作合并等，在有些场景下可以大幅度提升代码的可读及可维护性。 下面就演示一些利用函数组合重构代码以达到更好可维护性的例子 简单场景假设有如下代码：  1234process1(_ param: String) -&amp;gt; Stringprocess2(_ param: String) -&amp;gt; Stringprocess3(_ par">
@@ -325,7 +325,7 @@
                 
               
 
-              <time title="Created: 2018-10-03 22:24:56 / Modified: 22:35:18" itemprop="dateCreated datePublished" datetime="2018-10-03T22:24:56+08:00">2018-10-03</time>
+              <time title="Created: 2018-10-03 22:24:56 / Modified: 22:40:39" itemprop="dateCreated datePublished" datetime="2018-10-03T22:24:56+08:00">2018-10-03</time>
             
 
             
@@ -409,6 +409,8 @@
 <p>然后写相应的业务代码：</p>
 <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 新的处理代码</span></span><br><span class="line"><span class="keyword">let</span> process = asyncProcess1 ||| (curry(asyncProcess2_1)(value) &gt;&gt;&gt; asyncProcess2_2) ||| asyncProcess3</span><br><span class="line"><span class="comment">// process(strs)...</span></span><br></pre></td></tr></table></figure>
 <p>新代码的优势一目了然。并且这些例子都是拿的非常简单的示例来讲解的，真正的使用场景上，当操作数量逐渐增加，操作逻辑逐渐复杂时，传统的代码写法的冗余就越能显现。</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://github.com/ijoshsmith/function-composition-in-swift" target="_blank" rel="noopener">Function Composition in Swift</a></p>
+<p><a href="https://beeth0ven.github.io/RxSwift-Chinese-Documentation/" target="_blank" rel="noopener">RxSwift中文文档</a></p>
 
       
     </div>
@@ -582,7 +584,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#简单场景"><span class="nav-number">2.</span> <span class="nav-text">简单场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#优化"><span class="nav-number">3.</span> <span class="nav-text">优化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#更多场景"><span class="nav-number">4.</span> <span class="nav-text">更多场景</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#函数签名不一致"><span class="nav-number">4.1.</span> <span class="nav-text">函数签名不一致</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#异步操作"><span class="nav-number">4.2.</span> <span class="nav-text">异步操作</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#简单场景"><span class="nav-number">2.</span> <span class="nav-text">简单场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#优化"><span class="nav-number">3.</span> <span class="nav-text">优化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#更多场景"><span class="nav-number">4.</span> <span class="nav-text">更多场景</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#函数签名不一致"><span class="nav-number">4.1.</span> <span class="nav-text">函数签名不一致</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#异步操作"><span class="nav-number">4.2.</span> <span class="nav-text">异步操作</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">5.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
             
 
           </div>
