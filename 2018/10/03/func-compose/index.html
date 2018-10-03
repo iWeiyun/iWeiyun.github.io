@@ -114,7 +114,7 @@
 <meta property="og:site_name" content="微云iOS团队">
 <meta property="og:description" content="前言函数组合，在函数式编程里面也是挺重要的概念，能够将函数进行操作合并等，在有些场景下可以大幅度提升代码的可读及可维护性。 下面就演示一些利用函数组合重构代码以达到更好可维护性的例子 简单场景假设有如下代码：  1234process1(_ param: String) -&amp;gt; Stringprocess2(_ param: String) -&amp;gt; Stringprocess3(_ par">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-10-03T14:40:39.607Z">
+<meta property="og:updated_time" content="2018-10-03T14:51:35.093Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="利用函数组合提升代码可维护性">
 <meta name="twitter:description" content="前言函数组合，在函数式编程里面也是挺重要的概念，能够将函数进行操作合并等，在有些场景下可以大幅度提升代码的可读及可维护性。 下面就演示一些利用函数组合重构代码以达到更好可维护性的例子 简单场景假设有如下代码：  1234process1(_ param: String) -&amp;gt; Stringprocess2(_ param: String) -&amp;gt; Stringprocess3(_ par">
@@ -325,7 +325,7 @@
                 
               
 
-              <time title="Created: 2018-10-03 22:24:56 / Modified: 22:40:39" itemprop="dateCreated datePublished" datetime="2018-10-03T22:24:56+08:00">2018-10-03</time>
+              <time title="Created: 2018-10-03 22:24:56 / Modified: 22:51:35" itemprop="dateCreated datePublished" datetime="2018-10-03T22:24:56+08:00">2018-10-03</time>
             
 
             
@@ -372,7 +372,7 @@
 <p>或者更洒脱一些，写出如下的代码：</p>
 <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> ret = process4(process3(process2(process1(str))))</span><br></pre></td></tr></table></figure>
 <p>第二种方式可读性不算太好，第一种方式代码写起来又会非常繁琐。那应该如何来优化呢？</p>
-<h3 id="优化"><a href="#优化" class="headerlink" title="优化"></a>优化</h3><p>Swift中是支持<strong>自定义运算符</strong>的，而且swift中<strong>函数是一等公民</strong>。这两个特性是很强大的，利用他们，可以实现函数的组合，可以让代码看起来更简洁、更易读。</p>
+<h3 id="优化"><a href="#优化" class="headerlink" title="优化"></a>优化</h3><p>Swift中是支持<strong>自定义运算符</strong>的，而且swift中<strong>函数是一等公民</strong>。这两个特性是很强大的，利用他们，可以更好的实现函数的组合，可以让代码看起来更简洁、更易读。</p>
 <p>大概的思路是把process1、process2等进行组合，组合成一个新的函数，调用这个新函数的效果，跟分开挨个调用是一样的。</p>
 <p>优化后的代码如下：</p>
 <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">infix</span> <span class="keyword">operator</span> ++ : <span class="type">AdditionPrecedence</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> ++ <span class="params">(lhs: @escaping <span class="params">(String)</span></span></span> -&gt; <span class="type">String</span>, rhs: @escaping (<span class="type">String</span>) -&gt; <span class="type">String</span>) -&gt; (<span class="type">String</span>) -&gt; <span class="type">String</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123; rhs(lhs($<span class="number">0</span>)) &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> ret = (process1 ++ process2 ++ process3 ++ process4)(str)</span><br></pre></td></tr></table></figure>
