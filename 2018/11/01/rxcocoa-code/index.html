@@ -106,18 +106,18 @@
 
 
 
-  <meta name="description" content="前言RxCocoa是RxSwift的一部分，主要是UI相关的Rx封装。比如实现了很多组件的绑定功能，可以把值跟控件之间相互绑定，可以避免写很多通知、修改数据等代码。也可以监听delegate改变，无须把控件创建及delegate处理分开写等。 RxCocoa里面也定义了很多类，专门为UI处理提供的，比如ControlProperty、ControlEvent、Driver、Binder等。RxCo">
-<meta name="keywords" content="rxswift,rxcocoa,bind,rx">
+  <meta name="description" content="前言RxCocoa是RxSwift的一部分，主要是UI相关的Rx封装。比如实现了很多组件的绑定功能，简化处理逻辑。也可以监听delegate改变，无须把控件创建及delegate处理分开写等。 RxCocoa里面也定义了很多类，专门为UI处理提供的，比如ControlProperty、ControlEvent、Driver、Binder等。RxCocoa可以用好的话，可以极大简化UI相关处理逻辑。">
+<meta name="keywords" content="rxswift,rxcocoa,bind,ios,swift">
 <meta property="og:type" content="article">
-<meta property="og:title" content="一个RxCocoa简单示例及其实现原理">
+<meta property="og:title" content="RxCocoa简单源码分析">
 <meta property="og:url" content="http://www.weiyun.com/2018/11/01/rxcocoa-code/index.html">
 <meta property="og:site_name" content="微云iOS团队">
-<meta property="og:description" content="前言RxCocoa是RxSwift的一部分，主要是UI相关的Rx封装。比如实现了很多组件的绑定功能，可以把值跟控件之间相互绑定，可以避免写很多通知、修改数据等代码。也可以监听delegate改变，无须把控件创建及delegate处理分开写等。 RxCocoa里面也定义了很多类，专门为UI处理提供的，比如ControlProperty、ControlEvent、Driver、Binder等。RxCo">
+<meta property="og:description" content="前言RxCocoa是RxSwift的一部分，主要是UI相关的Rx封装。比如实现了很多组件的绑定功能，简化处理逻辑。也可以监听delegate改变，无须把控件创建及delegate处理分开写等。 RxCocoa里面也定义了很多类，专门为UI处理提供的，比如ControlProperty、ControlEvent、Driver、Binder等。RxCocoa可以用好的话，可以极大简化UI相关处理逻辑。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-11-01T13:44:52.784Z">
+<meta property="og:updated_time" content="2018-11-02T02:13:59.414Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="一个RxCocoa简单示例及其实现原理">
-<meta name="twitter:description" content="前言RxCocoa是RxSwift的一部分，主要是UI相关的Rx封装。比如实现了很多组件的绑定功能，可以把值跟控件之间相互绑定，可以避免写很多通知、修改数据等代码。也可以监听delegate改变，无须把控件创建及delegate处理分开写等。 RxCocoa里面也定义了很多类，专门为UI处理提供的，比如ControlProperty、ControlEvent、Driver、Binder等。RxCo">
+<meta name="twitter:title" content="RxCocoa简单源码分析">
+<meta name="twitter:description" content="前言RxCocoa是RxSwift的一部分，主要是UI相关的Rx封装。比如实现了很多组件的绑定功能，简化处理逻辑。也可以监听delegate改变，无须把控件创建及delegate处理分开写等。 RxCocoa里面也定义了很多类，专门为UI处理提供的，比如ControlProperty、ControlEvent、Driver、Binder等。RxCocoa可以用好的话，可以极大简化UI相关处理逻辑。">
 
 
   
@@ -138,7 +138,7 @@
   };
 </script>
 
-  <title>一个RxCocoa简单示例及其实现原理 | 微云iOS团队</title>
+  <title>RxCocoa简单源码分析 | 微云iOS团队</title>
   
 
 
@@ -300,7 +300,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">一个RxCocoa简单示例及其实现原理
+          <h1 class="post-title" itemprop="name headline">RxCocoa简单源码分析
               
             
           </h1>
@@ -325,12 +325,24 @@
                 
               
 
-              <time title="Created: 2018-11-01 21:38:28 / Modified: 21:44:52" itemprop="dateCreated datePublished" datetime="2018-11-01T21:38:28+08:00">2018-11-01</time>
+              <time title="Created: 2018-11-01 21:38:28" itemprop="dateCreated datePublished" datetime="2018-11-01T21:38:28+08:00">2018-11-01</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-11-02 10:13:59" itemprop="dateModified" datetime="2018-11-02T10:13:59+08:00">2018-11-02</time>
               
             
           </span>
@@ -367,7 +379,7 @@
       
 
       
-        <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>RxCocoa是<a href="https://github.com/ReactiveX/RxSwift" target="_blank" rel="noopener">RxSwift</a>的一部分，主要是UI相关的Rx封装。比如实现了很多组件的绑定功能，可以把值跟控件之间相互绑定，可以避免写很多通知、修改数据等代码。也可以监听delegate改变，无须把控件创建及delegate处理分开写等。</p>
+        <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>RxCocoa是<a href="https://github.com/ReactiveX/RxSwift" target="_blank" rel="noopener">RxSwift</a>的一部分，主要是UI相关的Rx封装。比如实现了很多组件的绑定功能，简化处理逻辑。也可以监听delegate改变，无须把控件创建及delegate处理分开写等。</p>
 <p>RxCocoa里面也定义了很多类，专门为UI处理提供的，比如<a href="https://beeth0ven.github.io/RxSwift-Chinese-Documentation/content/rxswift_core/observable_and_observer/control_property.html" target="_blank" rel="noopener">ControlProperty</a>、<a href="https://beeth0ven.github.io/RxSwift-Chinese-Documentation/content/rxswift_core/observable/control_event.html" target="_blank" rel="noopener">ControlEvent</a>、<a href="https://beeth0ven.github.io/RxSwift-Chinese-Documentation/content/rxswift_core/observable/driver.html" target="_blank" rel="noopener">Driver</a>、<a href="https://beeth0ven.github.io/RxSwift-Chinese-Documentation/content/rxswift_core/observer/binder.html" target="_blank" rel="noopener">Binder</a>等。RxCocoa可以用好的话，可以极大简化UI相关处理逻辑。但是，要想随心所欲的使用，还是要对其实现要有一定的了解，否则就容易写出不是那么简洁的代码。</p>
 <p>比如前几天在一篇博客上，看到的一段代码：</p>
 <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">textfield.rx.text</span><br><span class="line">    .asObservable()</span><br><span class="line">    .subscribe &#123; <span class="built_in">print</span>($<span class="number">0</span>) &#125;</span><br><span class="line">    .disposed(by: disposeBag)</span><br></pre></td></tr></table></figure>
@@ -444,7 +456,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/rxswift-rxcocoa-bind-rx/" rel="tag"># rxswift,rxcocoa,bind,rx</a>
+            <a href="/tags/rxswift-rxcocoa-bind-ios-swift/" rel="tag"># rxswift,rxcocoa,bind,ios,swift</a>
           
         </div>
       
@@ -549,6 +561,8 @@
                 <div class="site-state-item site-state-tags">
                   
                     
+                    
+                      
                     
                       
                     
