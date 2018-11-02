@@ -113,7 +113,7 @@
 <meta property="og:site_name" content="微云iOS团队">
 <meta property="og:description" content="Swift中，函数是一等公民 问题最近因为某个类中有重复代码，在“固化思维”重构之后，虽然原来的重复代码去掉了，但又有如下样式的代码，仔细想想，其实还是有重复，如files和dirs的获取，以及对结果的处理，代码是完全一样的。 123456789101112131415161718192021222324252627282930313233extension Array where Element">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-09-29T08:04:00.067Z">
+<meta property="og:updated_time" content="2018-11-02T10:48:53.937Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="利用柯里化去除重复代码">
 <meta name="twitter:description" content="Swift中，函数是一等公民 问题最近因为某个类中有重复代码，在“固化思维”重构之后，虽然原来的重复代码去掉了，但又有如下样式的代码，仔细想想，其实还是有重复，如files和dirs的获取，以及对结果的处理，代码是完全一样的。 123456789101112131415161718192021222324252627282930313233extension Array where Element">
@@ -339,7 +339,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2018-09-29 16:04:00" itemprop="dateModified" datetime="2018-09-29T16:04:00+08:00">2018-09-29</time>
+                <time title="Modified: 2018-11-02 18:48:53" itemprop="dateModified" datetime="2018-11-02T18:48:53+08:00">2018-11-02</time>
               
             
           </span>
@@ -403,6 +403,9 @@
 <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">fileprivate</span> <span class="class"><span class="keyword">extension</span> <span class="title">Array</span> <span class="title">where</span> <span class="title">Element</span>: <span class="title">WeiyunItem</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">restore</span><span class="params">(dir: WeiyunDir?)</span></span> -&gt; <span class="type">Completable</span> &#123;</span><br><span class="line">        <span class="keyword">let</span> f = curry2_3(<span class="type">WeiyunSDK</span>.sharedInstance().restoreRecycleFile)(dir?.dirkey, dir?.pdirkey)</span><br><span class="line">        <span class="keyword">return</span> operate(f)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">delete</span><span class="params">()</span></span> -&gt; <span class="type">Completable</span> &#123;</span><br><span class="line">        <span class="keyword">let</span> f = <span class="type">WeiyunSDK</span>.sharedInstance().clearRecycleFile</span><br><span class="line">        <span class="keyword">return</span> operate(f)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">func</span> <span class="title">operate</span><span class="params">(<span class="number">_</span> function: @escaping <span class="params">([WeiyunFile]?, [WeiyunDir]?, RestoreRecycleItemBlock?)</span></span></span> -&gt; <span class="type">Void</span>) -&gt; <span class="type">Completable</span> &#123;</span><br><span class="line">        <span class="keyword">let</span> files = compactMap &#123; $<span class="number">0</span> <span class="keyword">as</span>? <span class="type">WeiyunFile</span> &#125;</span><br><span class="line">        <span class="keyword">let</span> dirs = compactMap &#123; $<span class="number">0</span> <span class="keyword">as</span>? <span class="type">WeiyunDir</span> &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="type">Completable</span>.create &#123; observer -&gt; <span class="type">Disposable</span> <span class="keyword">in</span></span><br><span class="line">            function(files, dirs, &#123; <span class="number">_</span>, <span class="number">_</span>, err <span class="keyword">in</span></span><br><span class="line">                <span class="keyword">if</span> <span class="keyword">case</span> <span class="keyword">let</span> error <span class="keyword">as</span> <span class="type">NSError</span> = err &#123;</span><br><span class="line">                    observer(.error(error))</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    observer(.completed)</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;)</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> <span class="type">Disposables</span>.create()</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>这样就没有任何重复代码了</p>
 <p>这儿只是演示了柯里化非常简单的一种使用场景，在函数式编程中，对函数的处理变换无处不在，柯里化也会大放异彩！</p>
+<blockquote>
+<p>严格来说，curry2_3 这种处理方式，是叫函数部分施用，有些语言里会明确区分这些概念，有些语言里(例如Groovy)没有区分。</p>
+</blockquote>
 
       
     </div>
@@ -522,8 +525,6 @@
                 <div class="site-state-item site-state-tags">
                   
                     
-                    
-                      
                     
                       
                     
