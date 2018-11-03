@@ -203,3 +203,6 @@ fileprivate extension Array where Element: WeiyunItem {
 
 这儿只是演示了柯里化非常简单的一种使用场景，在函数式编程中，对函数的处理变换无处不在，柯里化也会大放异彩！
 
+
+
+> 严格来说，curry2_3 这种处理方式，是叫函数部分施用，有些语言里会明确区分这些概念，有些语言里(例如Groovy)没有区分。
