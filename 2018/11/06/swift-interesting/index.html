@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next mist" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="​      ​     自定义运算符不仅限于Ascii符号123infix operator ❤ : MultiplicationPrecedencefunc ❤(lhs: Int, rhs: Int) -&amp;gt; Int &amp;#123; return lhs + rhs &amp;#125;r = 1 ❤ 5	// 结果是6 除了❤，类似☢、☂、☯等都可以用，而且这些符号都是可以组合起来的 ​">
+<meta name="keywords" content="swift">
+<meta property="og:type" content="article">
+<meta property="og:title" content="你不知道的Swift">
+<meta property="og:url" content="http://www.weiyun.com/2018/11/06/swift-interesting/index.html">
+<meta property="og:site_name" content="微云iOS团队">
+<meta property="og:description" content="​      ​     自定义运算符不仅限于Ascii符号123infix operator ❤ : MultiplicationPrecedencefunc ❤(lhs: Int, rhs: Int) -&amp;gt; Int &amp;#123; return lhs + rhs &amp;#125;r = 1 ❤ 5	// 结果是6 除了❤，类似☢、☂、☯等都可以用，而且这些符号都是可以组合起来的 ​">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-11-06T14:58:41.397Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="你不知道的Swift">
+<meta name="twitter:description" content="​      ​     自定义运算符不仅限于Ascii符号123infix operator ❤ : MultiplicationPrecedencefunc ❤(lhs: Int, rhs: Int) -&amp;gt; Int &amp;#123; return lhs + rhs &amp;#125;r = 1 ❤ 5	// 结果是6 除了❤，类似☢、☂、☯等都可以用，而且这些符号都是可以组合起来的 ​">
+
+
+  
+
+
+  <link rel="alternate" href="/atom.xml" title="微云iOS团队" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="http://www.weiyun.com/2018/11/06/swift-interesting/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>你不知道的Swift | 微云iOS团队</title>
+  
+
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?75b2f2884a5033937b5cfdebf2ebce39";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">微云iOS团队</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.weiyun.com/2018/11/06/swift-interesting/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Weiyun Developer">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="微云iOS团队">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">你不知道的Swift
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2018-11-06 22:49:17 / Modified: 22:58:41" itemprop="dateCreated datePublished" datetime="2018-11-06T22:49:17+08:00">2018-11-06</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          <span> ｜ </span>
+          <span class="fa fa-user-o"> </span>
+          <span style="color:#222;"> matthew</span>
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>​    </p>
+<hr>
+<p>​    </p>
+<h3 id="自定义运算符不仅限于Ascii符号"><a href="#自定义运算符不仅限于Ascii符号" class="headerlink" title="自定义运算符不仅限于Ascii符号"></a>自定义运算符不仅限于Ascii符号</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">infix</span> <span class="keyword">operator</span> ❤ : <span class="type">MultiplicationPrecedence</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> ❤<span class="params">(lhs: Int, rhs: Int)</span></span> -&gt; <span class="type">Int</span> &#123; <span class="keyword">return</span> lhs + rhs &#125;</span><br><span class="line">r = <span class="number">1</span> ❤ <span class="number">5</span>	<span class="comment">// 结果是6</span></span><br></pre></td></tr></table></figure>
+<p>除了❤，类似☢、☂、☯等都可以用，而且这些符号都是可以组合起来的</p>
+<p>​    </p>
+<hr>
+<p>​    </p>
+<h3 id="空集合，是无法判断出有效类型的"><a href="#空集合，是无法判断出有效类型的" class="headerlink" title="空集合，是无法判断出有效类型的"></a>空集合，是无法判断出有效类型的</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> arr = [<span class="type">Int</span>]()</span><br><span class="line"><span class="keyword">if</span> arr <span class="keyword">is</span> [<span class="type">String</span>] &#123;</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"Match!!"</span>)	<span class="comment">// 会输出Match!!</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>​    </p>
+<hr>
+<p>​    </p>
+<h3 id="可变参数，在函数内部就是数组"><a href="#可变参数，在函数内部就是数组" class="headerlink" title="可变参数，在函数内部就是数组"></a>可变参数，在函数内部就是数组</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">test</span><span class="params">(params: String...)</span></span> &#123;</span><br><span class="line">    <span class="keyword">let</span> t = type(of: params)</span><br><span class="line">    <span class="built_in">print</span>(t)	<span class="comment">// 输出：Array&lt;String&gt;</span></span><br><span class="line">    <span class="built_in">print</span>(params)	<span class="comment">// 输出：["1", "2"]</span></span><br><span class="line">&#125;</span><br><span class="line">test(params: <span class="string">"1"</span>, <span class="string">"2"</span>)</span><br></pre></td></tr></table></figure>
+<p>​    </p>
+<hr>
+<p>​    </p>
+<h3 id="Optional类型，也是有map方法的"><a href="#Optional类型，也是有map方法的" class="headerlink" title="Optional类型，也是有map方法的"></a>Optional类型，也是有map方法的</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> i: <span class="type">Int</span>? = <span class="number">10</span></span><br><span class="line"><span class="keyword">let</span> r = i.<span class="built_in">map</span> &#123; $<span class="number">0</span> + <span class="number">1</span> &#125;</span><br><span class="line"><span class="built_in">print</span>(r)	<span class="comment">// Optional(11)</span></span><br></pre></td></tr></table></figure>
+<p>有些场景下可以极大简化代码</p>
+<p>​    </p>
+<hr>
+<p>​    </p>
+<h3 id="print是有更多参数可用的"><a href="#print是有更多参数可用的" class="headerlink" title="print是有更多参数可用的"></a>print是有更多参数可用的</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">print</span>(<span class="string">"Hello"</span>, <span class="string">"World"</span>, separator: <span class="string">" "</span>)	<span class="comment">// 输出Hello World，中间用空格分割</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 下面两句输出： HelloWorld，不会换行</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">"Hello"</span> terminator: <span class="string">""</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">"World"</span>)</span><br></pre></td></tr></table></figure>
+<p>除此之外还有debugPrint，可能会输出更详细的信息</p>
+<p>​    </p>
+<hr>
+<p>​    </p>
+<h3 id="可以很方便判断值是否在区间内"><a href="#可以很方便判断值是否在区间内" class="headerlink" title="~= 可以很方便判断值是否在区间内"></a>~= 可以很方便判断值是否在区间内</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> r = <span class="number">1</span>...<span class="number">5</span> ~= <span class="number">3</span></span><br><span class="line"><span class="built_in">print</span>(r)	<span class="comment">// 输出：true</span></span><br></pre></td></tr></table></figure>
+<p>​    </p>
+<hr>
+<p>​    </p>
+<h3 id="switch判断，可以更强大"><a href="#switch判断，可以更强大" class="headerlink" title="switch判断，可以更强大"></a>switch判断，可以更强大</h3><p>case后面跟可以不同类型，但需要重载 ~= 运算符</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> name : <span class="type">String</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> ~=<span class="params">(pattern: String, value: Person)</span></span> -&gt; <span class="type">Bool</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> value.name == pattern</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> person = <span class="type">Person</span>(name: <span class="string">"Alessandro"</span>)</span><br><span class="line"><span class="keyword">switch</span> person &#123;</span><br><span class="line"><span class="keyword">case</span> <span class="string">"Alessandro"</span>:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"Hey it's me!"</span>)</span><br><span class="line"><span class="keyword">default</span>:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"Not me"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>​    </p>
+<hr>
+<p>​    </p>
+<h3 id="空元组，可以在不关心类型及数据时使用"><a href="#空元组，可以在不关心类型及数据时使用" class="headerlink" title="空元组，可以在不关心类型及数据时使用"></a>空元组，可以在不关心类型及数据时使用</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">emptyTuple</span><span class="params">(<span class="number">_</span>: <span class="params">()</span></span></span>) &#123;</span><br><span class="line">    <span class="comment">// some code</span></span><br><span class="line">&#125;</span><br><span class="line">emptyTuple(())	<span class="comment">// 调用时也需要传入空元组</span></span><br></pre></td></tr></table></figure>
+<p>在Rx中，是有大量这样的使用，比如事件通知，不需要传数据，只要触发一下的情况，可能会用()</p>
+<p>​    </p>
+<p>Swift中，Void也是用的空元组来定义的</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">typealias</span> <span class="type">Void</span> = ()</span><br></pre></td></tr></table></figure>
+<p>​    </p>
+<hr>
+<p>​    </p>
+<h3 id="一起遍历两个Sequence时，可以用zip"><a href="#一起遍历两个Sequence时，可以用zip" class="headerlink" title="一起遍历两个Sequence时，可以用zip"></a>一起遍历两个Sequence时，可以用zip</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> lst1 = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line"><span class="keyword">let</span> lst2 = [<span class="string">"a"</span>, <span class="string">"b"</span>, <span class="string">"c"</span>, <span class="string">"d"</span>]</span><br><span class="line"><span class="keyword">for</span> (a, b) <span class="keyword">in</span> <span class="built_in">zip</span>(lst1, lst2) &#123;</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"<span class="subst">\(a)</span><span class="subst">\(b)</span>"</span>)	<span class="comment">// 输出1a 2b 3c，以短的列表为准</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>​    </p>
+<hr>
+<p>​    </p>
+<h3 id="全局变量默认就是lazy的"><a href="#全局变量默认就是lazy的" class="headerlink" title="全局变量默认就是lazy的"></a>全局变量默认就是lazy的</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">globalFunc</span><span class="params">()</span></span> -&gt; <span class="type">Int</span> &#123;</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"Hello"</span>)</span><br><span class="line">    <span class="keyword">return</span> <span class="number">42</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> globalVar = globalFunc()	<span class="comment">// 只有globalVar被使用时，globalFunc才会被调用</span></span><br></pre></td></tr></table></figure>
+<p>苹果源码仓库里有相应的测试代码，可以详细看到什么情况下会是懒加载：<a href="https://github.com/apple/swift/blob/master/test/decl/var/lazy_properties.swift" target="_blank" rel="noopener">lazy_properties.swift</a></p>
+<p>​    </p>
+<hr>
+<p>​    </p>
+<h3 id="precondition，比assert更严格的检查"><a href="#precondition，比assert更严格的检查" class="headerlink" title="precondition，比assert更严格的检查"></a>precondition，比assert更严格的检查</h3><p>用法上与assert类似，但更严格，只有-Ounchecked选项才能关闭，但这样会很危险</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">precondition</span>(x &gt;= <span class="number">0</span>)</span><br></pre></td></tr></table></figure>
+<p>​    </p>
+<hr>
+<p>​    </p>
+<h3 id="struct在没有自定义init时，系统会帮我们生成"><a href="#struct在没有自定义init时，系统会帮我们生成" class="headerlink" title="struct在没有自定义init时，系统会帮我们生成"></a>struct在没有自定义init时，系统会帮我们生成</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">MySize</span> </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> width: <span class="type">CGFloat</span> = <span class="number">0</span></span><br><span class="line">    <span class="keyword">var</span> height: <span class="type">CGFloat</span> = <span class="number">0</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">let</span> s1 = <span class="type">MySize</span>(width: <span class="number">1</span>, height: <span class="number">1</span>)</span><br><span class="line"><span class="keyword">let</span> s2 = <span class="type">MySize</span>()	<span class="comment">// 如果上面没有指定默认值，则不会生成这个初始化方法</span></span><br></pre></td></tr></table></figure>
+<p>​    </p>
+<hr>
+<p>​    </p>
+<h3 id="compactMap可以从列表中筛选出指定类型"><a href="#compactMap可以从列表中筛选出指定类型" class="headerlink" title="compactMap可以从列表中筛选出指定类型"></a>compactMap可以从列表中筛选出指定类型</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> arrs: [<span class="type">Any</span>] = [<span class="number">1</span>, <span class="number">2</span>, <span class="string">"3"</span>, <span class="string">"4"</span>, <span class="number">5</span>]</span><br><span class="line"><span class="keyword">let</span> r = arrs.compactMap &#123; $<span class="number">0</span> <span class="keyword">as</span>? <span class="type">String</span> &#125;	<span class="comment">// r已经被推断为[String]类型</span></span><br><span class="line"><span class="built_in">print</span>(r)	<span class="comment">// 输出：["3", "4"]</span></span><br></pre></td></tr></table></figure>
+<p>​    </p>
+<hr>
+<p>​    </p>
+<h3 id="从Dictionary获取值时，可以提供默认值"><a href="#从Dictionary获取值时，可以提供默认值" class="headerlink" title="从Dictionary获取值时，可以提供默认值"></a>从Dictionary获取值时，可以提供默认值</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> dict = [<span class="string">"1"</span>: <span class="number">1</span>]</span><br><span class="line"><span class="keyword">let</span> o = dict[<span class="string">"2"</span>, <span class="keyword">default</span>: <span class="number">2</span>]</span><br><span class="line"><span class="built_in">print</span>(o)	<span class="comment">// 输出：2</span></span><br></pre></td></tr></table></figure>
+<p>​    </p>
+<hr>
+<p>​    </p>
+<h3 id="运算符也是方法"><a href="#运算符也是方法" class="headerlink" title="运算符也是方法"></a>运算符也是方法</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> r = (+)(<span class="number">5</span>, <span class="number">6</span>)</span><br><span class="line"><span class="built_in">print</span>(r)	<span class="comment">// 输出：11</span></span><br></pre></td></tr></table></figure>
+<p>​    </p>
+<hr>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/swift/" rel="tag"># swift</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/01/rxcocoa-code/" rel="next" title="RxCocoa简单源码分析">
+                <i class="fa fa-chevron-left"></i> RxCocoa简单源码分析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Weiyun Developer</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">7</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#自定义运算符不仅限于Ascii符号"><span class="nav-number">1.</span> <span class="nav-text">自定义运算符不仅限于Ascii符号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#空集合，是无法判断出有效类型的"><span class="nav-number">2.</span> <span class="nav-text">空集合，是无法判断出有效类型的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#可变参数，在函数内部就是数组"><span class="nav-number">3.</span> <span class="nav-text">可变参数，在函数内部就是数组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Optional类型，也是有map方法的"><span class="nav-number">4.</span> <span class="nav-text">Optional类型，也是有map方法的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#print是有更多参数可用的"><span class="nav-number">5.</span> <span class="nav-text">print是有更多参数可用的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#可以很方便判断值是否在区间内"><span class="nav-number">6.</span> <span class="nav-text">~= 可以很方便判断值是否在区间内</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#switch判断，可以更强大"><span class="nav-number">7.</span> <span class="nav-text">switch判断，可以更强大</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#空元组，可以在不关心类型及数据时使用"><span class="nav-number">8.</span> <span class="nav-text">空元组，可以在不关心类型及数据时使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#一起遍历两个Sequence时，可以用zip"><span class="nav-number">9.</span> <span class="nav-text">一起遍历两个Sequence时，可以用zip</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#全局变量默认就是lazy的"><span class="nav-number">10.</span> <span class="nav-text">全局变量默认就是lazy的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#precondition，比assert更严格的检查"><span class="nav-number">11.</span> <span class="nav-text">precondition，比assert更严格的检查</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#struct在没有自定义init时，系统会帮我们生成"><span class="nav-number">12.</span> <span class="nav-text">struct在没有自定义init时，系统会帮我们生成</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#compactMap可以从列表中筛选出指定类型"><span class="nav-number">13.</span> <span class="nav-text">compactMap可以从列表中筛选出指定类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#从Dictionary获取值时，可以提供默认值"><span class="nav-number">14.</span> <span class="nav-text">从Dictionary获取值时，可以提供默认值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#运算符也是方法"><span class="nav-number">15.</span> <span class="nav-text">运算符也是方法</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Weiyun Developer</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
