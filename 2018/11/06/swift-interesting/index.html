@@ -110,7 +110,7 @@
 <meta name="keywords" content="swift">
 <meta property="og:type" content="article">
 <meta property="og:title" content="你不知道的Swift">
-<meta property="og:url" content="http://www.weiyun.com/2018/11/06/swift-interesting/index.html">
+<meta property="og:url" content="https://iweiyun.github.io/2018/11/06/swift-interesting/index.html">
 <meta property="og:site_name" content="微云iOS团队">
 <meta property="og:description" content="​      ​     自定义运算符不仅限于Ascii符号123infix operator ❤ : MultiplicationPrecedencefunc ❤(lhs: Int, rhs: Int) -&amp;gt; Int &amp;#123; return lhs + rhs &amp;#125;r = 1 ❤ 5	// 结果是6 除了❤，类似☢、☂、☯等都可以用，而且这些符号都是可以组合起来的 ​">
 <meta property="og:locale" content="zh-Hans">
@@ -120,13 +120,15 @@
 <meta name="twitter:description" content="​      ​     自定义运算符不仅限于Ascii符号123infix operator ❤ : MultiplicationPrecedencefunc ❤(lhs: Int, rhs: Int) -&amp;gt; Int &amp;#123; return lhs + rhs &amp;#125;r = 1 ❤ 5	// 结果是6 除了❤，类似☢、☂、☯等都可以用，而且这些符号都是可以组合起来的 ​">
 
 
+  
+
 
   <link rel="alternate" href="/atom.xml" title="微云iOS团队" type="application/atom+xml" />
 
 
 
 
-  <link rel="canonical" href="http://www.weiyun.com/2018/11/06/swift-interesting/"/>
+  <link rel="canonical" href="https://iweiyun.github.io/2018/11/06/swift-interesting/"/>
 
 
 
@@ -291,7 +293,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.weiyun.com/2018/11/06/swift-interesting/">
+    <link itemprop="mainEntityOfPage" href="https://iweiyun.github.io/2018/11/06/swift-interesting/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Weiyun Developer">
@@ -419,7 +421,7 @@
 <p>​    </p>
 <hr>
 <p>​    </p>
-<h3 id="一起遍历两个Sequence时，可以用zip"><a href="#一起遍历两个Sequence时，可以用zip" class="headerlink" title="一起遍历两个Sequence时，可以用zip"></a>一起遍历两个Sequence时，可以用zip</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> lst1 = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line"><span class="keyword">let</span> lst2 = [<span class="string">"a"</span>, <span class="string">"b"</span>, <span class="string">"c"</span>, <span class="string">"d"</span>]</span><br><span class="line"><span class="keyword">for</span> (a, b) <span class="keyword">in</span> <span class="built_in">zip</span>(lst1, lst2) &#123;</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"<span class="subst">\(a)</span><span class="subst">\(b)</span>"</span>)	<span class="comment">// 输出1a 2b 3c，以短的列表为准</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="一起遍历两个Sequence时，可以用zip"><a href="#一起遍历两个Sequence时，可以用zip" class="headerlink" title="一起遍历两个Sequence时，可以用zip"></a>一起遍历两个Sequence时，可以用zip</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> lst1 = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line"><span class="keyword">let</span> lst2 = [<span class="string">"a"</span>, <span class="string">"b"</span>, <span class="string">"c"</span>, <span class="string">"d"</span>]</span><br><span class="line"><span class="keyword">for</span> (a, b) <span class="keyword">in</span> <span class="built_in">zip</span>(lst1, lst2) &#123;</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"\(a)\(b)"</span>)	<span class="comment">// 输出1a 2b 3c，以短的列表为准</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>​    </p>
 <hr>
 <p>​    </p>

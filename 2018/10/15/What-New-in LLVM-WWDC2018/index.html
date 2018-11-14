@@ -110,33 +110,33 @@
 <meta name="keywords" content="llvm,iOS,oc">
 <meta property="og:type" content="article">
 <meta property="og:title" content="What&#39;s New in LLVM（WWDC2018）">
-<meta property="og:url" content="http://www.weiyun.com/2018/10/15/What-New-in LLVM-WWDC2018/index.html">
+<meta property="og:url" content="https://iweiyun.github.io/2018/10/15/What-New-in LLVM-WWDC2018/index.html">
 <meta property="og:site_name" content="微云iOS团队">
 <meta property="og:description" content="在WWDC上，LLVM这个Section，基本是年年都有，前年写了篇文章介绍了下，今年继续吧。本来想着今年有官方的中文字幕了，可喜可贺、可喜可贺，然而却是下面这样的情况： 看到这里我还是默默的切回了英文字母，这里就当给大家翻译翻译这篇Section。 一、C结构体中OC对象的ARC支持Xcode10之前大家应该都知道ARC下struct里是不能放OC对象的，Xcode10中解除了这一限制，并且对于">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://www.weiyun.com/images/1539259407_77.png">
-<meta property="og:image" content="http://www.weiyun.com/images/1539259445_13.png">
-<meta property="og:image" content="http://www.weiyun.com/images/1539260984_70.png">
-<meta property="og:image" content="http://www.weiyun.com/images/1539263611_74.png">
-<meta property="og:image" content="http://www.weiyun.com/images/1539263691_74.png">
-<meta property="og:image" content="http://www.weiyun.com/images/1539264271_32.png">
-<meta property="og:image" content="http://www.weiyun.com/images/1539313163_77.png">
-<meta property="og:image" content="http://www.weiyun.com/images/1539313204_74.png">
-<meta property="og:image" content="http://www.weiyun.com/images/1539313946_53.png">
-<meta property="og:image" content="http://www.weiyun.com/images/1539314934_1.png">
-<meta property="og:image" content="http://www.weiyun.com/images/1539532681_73.png">
-<meta property="og:image" content="http://www.weiyun.com/images/1539533246_91.png">
-<meta property="og:image" content="http://www.weiyun.com/images/1539533945_77.png">
-<meta property="og:image" content="http://www.weiyun.com/images/1539533957_92.png">
-<meta property="og:image" content="http://www.weiyun.com/images/1539535234_63.png">
-<meta property="og:image" content="http://www.weiyun.com/images/1539535965_94.png">
-<meta property="og:image" content="http://www.weiyun.com/images/1539536569_76.png">
-<meta property="og:image" content="http://www.weiyun.com/images/1539536873_18.png">
+<meta property="og:image" content="https://iweiyun.github.io/images/1539259407_77.png">
+<meta property="og:image" content="https://iweiyun.github.io/images/1539259445_13.png">
+<meta property="og:image" content="https://iweiyun.github.io/images/1539260984_70.png">
+<meta property="og:image" content="https://iweiyun.github.io/images/1539263611_74.png">
+<meta property="og:image" content="https://iweiyun.github.io/images/1539263691_74.png">
+<meta property="og:image" content="https://iweiyun.github.io/images/1539264271_32.png">
+<meta property="og:image" content="https://iweiyun.github.io/images/1539313163_77.png">
+<meta property="og:image" content="https://iweiyun.github.io/images/1539313204_74.png">
+<meta property="og:image" content="https://iweiyun.github.io/images/1539313946_53.png">
+<meta property="og:image" content="https://iweiyun.github.io/images/1539314934_1.png">
+<meta property="og:image" content="https://iweiyun.github.io/images/1539532681_73.png">
+<meta property="og:image" content="https://iweiyun.github.io/images/1539533246_91.png">
+<meta property="og:image" content="https://iweiyun.github.io/images/1539533945_77.png">
+<meta property="og:image" content="https://iweiyun.github.io/images/1539533957_92.png">
+<meta property="og:image" content="https://iweiyun.github.io/images/1539535234_63.png">
+<meta property="og:image" content="https://iweiyun.github.io/images/1539535965_94.png">
+<meta property="og:image" content="https://iweiyun.github.io/images/1539536569_76.png">
+<meta property="og:image" content="https://iweiyun.github.io/images/1539536873_18.png">
 <meta property="og:updated_time" content="2018-10-15T04:13:27.884Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="What&#39;s New in LLVM（WWDC2018）">
 <meta name="twitter:description" content="在WWDC上，LLVM这个Section，基本是年年都有，前年写了篇文章介绍了下，今年继续吧。本来想着今年有官方的中文字幕了，可喜可贺、可喜可贺，然而却是下面这样的情况： 看到这里我还是默默的切回了英文字母，这里就当给大家翻译翻译这篇Section。 一、C结构体中OC对象的ARC支持Xcode10之前大家应该都知道ARC下struct里是不能放OC对象的，Xcode10中解除了这一限制，并且对于">
-<meta name="twitter:image" content="http://www.weiyun.com/images/1539259407_77.png">
+<meta name="twitter:image" content="https://iweiyun.github.io/images/1539259407_77.png">
 
 
 
@@ -145,7 +145,7 @@
 
 
 
-  <link rel="canonical" href="http://www.weiyun.com/2018/10/15/What-New-in LLVM-WWDC2018/"/>
+  <link rel="canonical" href="https://iweiyun.github.io/2018/10/15/What-New-in LLVM-WWDC2018/"/>
 
 
 
@@ -310,7 +310,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.weiyun.com/2018/10/15/What-New-in LLVM-WWDC2018/">
+    <link itemprop="mainEntityOfPage" href="https://iweiyun.github.io/2018/10/15/What-New-in LLVM-WWDC2018/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Weiyun Developer">
