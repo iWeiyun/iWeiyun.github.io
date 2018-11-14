@@ -7,7 +7,7 @@ tags: haskell,swift,函数式
 
 
 
-### 前言
+#### 前言
 
 
 
@@ -19,7 +19,7 @@ Swift是一门多泛式语言，而且参考了很多其它语言的实现，所
 
 
 
-### 对比
+#### 对比
 
 ----
 
@@ -258,7 +258,7 @@ a <^> b = a + b
 ​	<font color=gray size=2>*Swift*</font>
 
 ```swift
-[1, 2, 3].map { $0 * 2}	// [2, 4, 6]
+[1, 2, 3].map { $0 * 2}		// [2, 4, 6]
 ```
 
 ​	<font color=gray size=2>*Haskell*</font>
