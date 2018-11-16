@@ -109,16 +109,18 @@
   <meta name="description" content="​      ​     自定义运算符不仅限于Ascii符号123infix operator ❤ : MultiplicationPrecedencefunc ❤(lhs: Int, rhs: Int) -&amp;gt; Int &amp;#123; return lhs + rhs &amp;#125;r = 1 ❤ 5	// 结果是6 除了❤，类似☢、☂、☯等都可以用，而且这些符号都是可以组合起来的 ​">
 <meta name="keywords" content="swift">
 <meta property="og:type" content="article">
-<meta property="og:title" content="你不知道的Swift">
+<meta property="og:title" content="你可能不知道的Swift">
 <meta property="og:url" content="https://iweiyun.github.io/2018/11/06/swift-interesting/index.html">
 <meta property="og:site_name" content="微云iOS团队">
 <meta property="og:description" content="​      ​     自定义运算符不仅限于Ascii符号123infix operator ❤ : MultiplicationPrecedencefunc ❤(lhs: Int, rhs: Int) -&amp;gt; Int &amp;#123; return lhs + rhs &amp;#125;r = 1 ❤ 5	// 结果是6 除了❤，类似☢、☂、☯等都可以用，而且这些符号都是可以组合起来的 ​">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-11-06T14:58:41.397Z">
+<meta property="og:updated_time" content="2018-11-16T12:50:58.541Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="你不知道的Swift">
+<meta name="twitter:title" content="你可能不知道的Swift">
 <meta name="twitter:description" content="​      ​     自定义运算符不仅限于Ascii符号123infix operator ❤ : MultiplicationPrecedencefunc ❤(lhs: Int, rhs: Int) -&amp;gt; Int &amp;#123; return lhs + rhs &amp;#125;r = 1 ❤ 5	// 结果是6 除了❤，类似☢、☂、☯等都可以用，而且这些符号都是可以组合起来的 ​">
 
+
+  
 
 
   <link rel="alternate" href="/atom.xml" title="微云iOS团队" type="application/atom+xml" />
@@ -136,7 +138,7 @@
   };
 </script>
 
-  <title>你不知道的Swift | 微云iOS团队</title>
+  <title>你可能不知道的Swift | 微云iOS团队</title>
   
 
 
@@ -308,7 +310,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">你不知道的Swift
+          <h1 class="post-title" itemprop="name headline">你可能不知道的Swift
               
             
           </h1>
@@ -333,12 +335,24 @@
                 
               
 
-              <time title="Created: 2018-11-06 22:49:17 / Modified: 22:58:41" itemprop="dateCreated datePublished" datetime="2018-11-06T22:49:17+08:00">2018-11-06</time>
+              <time title="Created: 2018-11-06 22:49:17" itemprop="dateCreated datePublished" datetime="2018-11-06T22:49:17+08:00">2018-11-06</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-11-16 20:50:58" itemprop="dateModified" datetime="2018-11-16T20:50:58+08:00">2018-11-16</time>
               
             
           </span>
@@ -396,6 +410,13 @@
 <p>​    </p>
 <hr>
 <p>​    </p>
+<h3 id="闭包仅能推断出单表达式的返回值"><a href="#闭包仅能推断出单表达式的返回值" class="headerlink" title="闭包仅能推断出单表达式的返回值"></a>闭包仅能推断出单表达式的返回值</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>].<span class="built_in">map</span> &#123; item <span class="keyword">in</span>	<span class="comment">// Error: Unable to infer complex closure return type</span></span><br><span class="line">	<span class="keyword">let</span> r = item * item</span><br><span class="line">	<span class="keyword">return</span> r + <span class="number">1</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>只有改成如下形式才能编译通过</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>].<span class="built_in">map</span> &#123; item <span class="keyword">in</span>	<span class="comment">// Error: Unable to infer complex closure return type</span></span><br><span class="line">	item * item + <span class="number">1</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>单表达式时，return关键字也可以省略</p>
+<p>​    </p>
+<hr>
+<p>​    </p>
 <h3 id="print是有更多参数可用的"><a href="#print是有更多参数可用的" class="headerlink" title="print是有更多参数可用的"></a>print是有更多参数可用的</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">print</span>(<span class="string">"Hello"</span>, <span class="string">"World"</span>, separator: <span class="string">" "</span>)	<span class="comment">// 输出Hello World，中间用空格分割</span></span><br></pre></td></tr></table></figure>
 <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 下面两句输出： HelloWorld，不会换行</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">"Hello"</span> terminator: <span class="string">""</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">"World"</span>)</span><br></pre></td></tr></table></figure>
 <p>除此之外还有debugPrint，可能会输出更详细的信息</p>
@@ -419,7 +440,7 @@
 <p>​    </p>
 <hr>
 <p>​    </p>
-<h3 id="一起遍历两个Sequence时，可以用zip"><a href="#一起遍历两个Sequence时，可以用zip" class="headerlink" title="一起遍历两个Sequence时，可以用zip"></a>一起遍历两个Sequence时，可以用zip</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> lst1 = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line"><span class="keyword">let</span> lst2 = [<span class="string">"a"</span>, <span class="string">"b"</span>, <span class="string">"c"</span>, <span class="string">"d"</span>]</span><br><span class="line"><span class="keyword">for</span> (a, b) <span class="keyword">in</span> <span class="built_in">zip</span>(lst1, lst2) &#123;</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"\(a)\(b)"</span>)	<span class="comment">// 输出1a 2b 3c，以短的列表为准</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="一起遍历两个Sequence时，可以用zip"><a href="#一起遍历两个Sequence时，可以用zip" class="headerlink" title="一起遍历两个Sequence时，可以用zip"></a>一起遍历两个Sequence时，可以用zip</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> lst1 = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line"><span class="keyword">let</span> lst2 = [<span class="string">"a"</span>, <span class="string">"b"</span>, <span class="string">"c"</span>, <span class="string">"d"</span>]</span><br><span class="line"><span class="keyword">for</span> (a, b) <span class="keyword">in</span> <span class="built_in">zip</span>(lst1, lst2) &#123;</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"<span class="subst">\(a)</span><span class="subst">\(b)</span>"</span>)	<span class="comment">// 输出1a 2b 3c，以短的列表为准</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>​    </p>
 <hr>
 <p>​    </p>
@@ -563,7 +584,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-count">9</span>
                     <span class="site-state-item-name">posts</span>
                   </a>
                 </div>
@@ -592,7 +613,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">7</span>
+                      
+                    
+                    <span class="site-state-item-count">8</span>
                     <span class="site-state-item-name">tags</span>
                   
                 </div>
@@ -635,7 +658,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#自定义运算符不仅限于Ascii符号"><span class="nav-number">1.</span> <span class="nav-text">自定义运算符不仅限于Ascii符号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#空集合，是无法判断出有效类型的"><span class="nav-number">2.</span> <span class="nav-text">空集合，是无法判断出有效类型的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#可变参数，在函数内部就是数组"><span class="nav-number">3.</span> <span class="nav-text">可变参数，在函数内部就是数组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Optional类型，也是有map方法的"><span class="nav-number">4.</span> <span class="nav-text">Optional类型，也是有map方法的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#print是有更多参数可用的"><span class="nav-number">5.</span> <span class="nav-text">print是有更多参数可用的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#可以很方便判断值是否在区间内"><span class="nav-number">6.</span> <span class="nav-text">~= 可以很方便判断值是否在区间内</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#switch判断，可以更强大"><span class="nav-number">7.</span> <span class="nav-text">switch判断，可以更强大</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#空元组，可以在不关心类型及数据时使用"><span class="nav-number">8.</span> <span class="nav-text">空元组，可以在不关心类型及数据时使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#一起遍历两个Sequence时，可以用zip"><span class="nav-number">9.</span> <span class="nav-text">一起遍历两个Sequence时，可以用zip</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#全局变量默认就是lazy的"><span class="nav-number">10.</span> <span class="nav-text">全局变量默认就是lazy的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#precondition，比assert更严格的检查"><span class="nav-number">11.</span> <span class="nav-text">precondition，比assert更严格的检查</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#struct在没有自定义init时，系统会帮我们生成"><span class="nav-number">12.</span> <span class="nav-text">struct在没有自定义init时，系统会帮我们生成</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#compactMap可以从列表中筛选出指定类型"><span class="nav-number">13.</span> <span class="nav-text">compactMap可以从列表中筛选出指定类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#从Dictionary获取值时，可以提供默认值"><span class="nav-number">14.</span> <span class="nav-text">从Dictionary获取值时，可以提供默认值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#运算符也是方法"><span class="nav-number">15.</span> <span class="nav-text">运算符也是方法</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#自定义运算符不仅限于Ascii符号"><span class="nav-number">1.</span> <span class="nav-text">自定义运算符不仅限于Ascii符号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#空集合，是无法判断出有效类型的"><span class="nav-number">2.</span> <span class="nav-text">空集合，是无法判断出有效类型的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#可变参数，在函数内部就是数组"><span class="nav-number">3.</span> <span class="nav-text">可变参数，在函数内部就是数组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Optional类型，也是有map方法的"><span class="nav-number">4.</span> <span class="nav-text">Optional类型，也是有map方法的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#闭包仅能推断出单表达式的返回值"><span class="nav-number">5.</span> <span class="nav-text">闭包仅能推断出单表达式的返回值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#print是有更多参数可用的"><span class="nav-number">6.</span> <span class="nav-text">print是有更多参数可用的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#可以很方便判断值是否在区间内"><span class="nav-number">7.</span> <span class="nav-text">~= 可以很方便判断值是否在区间内</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#switch判断，可以更强大"><span class="nav-number">8.</span> <span class="nav-text">switch判断，可以更强大</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#空元组，可以在不关心类型及数据时使用"><span class="nav-number">9.</span> <span class="nav-text">空元组，可以在不关心类型及数据时使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#一起遍历两个Sequence时，可以用zip"><span class="nav-number">10.</span> <span class="nav-text">一起遍历两个Sequence时，可以用zip</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#全局变量默认就是lazy的"><span class="nav-number">11.</span> <span class="nav-text">全局变量默认就是lazy的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#precondition，比assert更严格的检查"><span class="nav-number">12.</span> <span class="nav-text">precondition，比assert更严格的检查</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#struct在没有自定义init时，系统会帮我们生成"><span class="nav-number">13.</span> <span class="nav-text">struct在没有自定义init时，系统会帮我们生成</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#compactMap可以从列表中筛选出指定类型"><span class="nav-number">14.</span> <span class="nav-text">compactMap可以从列表中筛选出指定类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#从Dictionary获取值时，可以提供默认值"><span class="nav-number">15.</span> <span class="nav-text">从Dictionary获取值时，可以提供默认值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#运算符也是方法"><span class="nav-number">16.</span> <span class="nav-text">运算符也是方法</span></a></li></ol></div>
             
 
           </div>
