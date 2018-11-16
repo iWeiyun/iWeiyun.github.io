@@ -1,12 +1,11 @@
 ---
-title: 你不知道的Swift
+title: 你可能不知道的Swift
 date: 2018-11-06 22:49:17
 author: matthew
 tags: swift
 ---
 
 ​	
-
 
 ---
 
@@ -92,7 +91,30 @@ print(r)	// Optional(11)
 
 ​	
 
+### 闭包仅能推断出单表达式的返回值
 
+```swift
+[1, 2, 3, 4].map { item in	// Error: Unable to infer complex closure return type
+	let r = item * item
+	return r + 1
+}
+```
+
+只有改成如下形式才能编译通过
+
+```swift
+[1, 2, 3, 4].map { item in	// Error: Unable to infer complex closure return type
+	item * item + 1
+}
+```
+
+单表达式时，return关键字也可以省略
+
+​	
+
+------
+
+​	
 
 ### print是有更多参数可用的
 
