@@ -106,13 +106,13 @@
 
 
 
-  <meta name="description" content="开始之前，先推荐个小段子：好久不见​以前在iOS上，除了RAC，比较少有函数式编程方面的实践。swift对函数式做了较多的支持，随着swift的普及，在iOS社区，函数式编程被越来越多的开发者所接受。并且因为函数式编程的一些优点，也越来越多的语言开始支持函数式的开发范式。 因为最近也在项目中开始实践函数式编程，也能逐渐感受到函数式强大之处。目前也有一点心得，本文就谈下自己对函数式编程的理解。 ​">
+  <meta name="description" content="以前在iOS上，除了RAC，比较少有函数式编程方面的实践。swift对函数式做了较多的支持，随着swift的普及，在iOS社区，函数式编程被越来越多的开发者所接受。并且因为函数式编程的一些优点，也越来越多的语言开始支持函数式的开发范式。 因为最近也在项目中开始实践函数式编程，也能逐渐感受到函数式强大之处。目前也有一点心得，本文就谈下自己对函数式编程的理解。​不过在开始之前，先推荐个小段子：好久不见">
 <meta name="keywords" content="swift,functional">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Swift函数式编程探索">
 <meta property="og:url" content="https://iweiyun.github.io/2018/11/19/swift-functional/index.html">
 <meta property="og:site_name" content="微云iOS团队">
-<meta property="og:description" content="开始之前，先推荐个小段子：好久不见​以前在iOS上，除了RAC，比较少有函数式编程方面的实践。swift对函数式做了较多的支持，随着swift的普及，在iOS社区，函数式编程被越来越多的开发者所接受。并且因为函数式编程的一些优点，也越来越多的语言开始支持函数式的开发范式。 因为最近也在项目中开始实践函数式编程，也能逐渐感受到函数式强大之处。目前也有一点心得，本文就谈下自己对函数式编程的理解。 ​">
+<meta property="og:description" content="以前在iOS上，除了RAC，比较少有函数式编程方面的实践。swift对函数式做了较多的支持，随着swift的普及，在iOS社区，函数式编程被越来越多的开发者所接受。并且因为函数式编程的一些优点，也越来越多的语言开始支持函数式的开发范式。 因为最近也在项目中开始实践函数式编程，也能逐渐感受到函数式强大之处。目前也有一点心得，本文就谈下自己对函数式编程的理解。​不过在开始之前，先推荐个小段子：好久不见">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://iweiyun.github.io/images/swift-functional/1542568661_33.png">
 <meta property="og:image" content="https://iweiyun.github.io/images/swift-functional/1542568666_91.png">
@@ -125,10 +125,10 @@
 <meta property="og:image" content="https://iweiyun.github.io/images/swift-functional/1542627283_39.png">
 <meta property="og:image" content="https://iweiyun.github.io/images/swift-functional/1542627287_75.png">
 <meta property="og:image" content="https://iweiyun.github.io/images/swift-functional/1542627988_47.png">
-<meta property="og:updated_time" content="2018-11-19T13:09:09.783Z">
+<meta property="og:updated_time" content="2018-11-19T13:36:54.777Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Swift函数式编程探索">
-<meta name="twitter:description" content="开始之前，先推荐个小段子：好久不见​以前在iOS上，除了RAC，比较少有函数式编程方面的实践。swift对函数式做了较多的支持，随着swift的普及，在iOS社区，函数式编程被越来越多的开发者所接受。并且因为函数式编程的一些优点，也越来越多的语言开始支持函数式的开发范式。 因为最近也在项目中开始实践函数式编程，也能逐渐感受到函数式强大之处。目前也有一点心得，本文就谈下自己对函数式编程的理解。 ​">
+<meta name="twitter:description" content="以前在iOS上，除了RAC，比较少有函数式编程方面的实践。swift对函数式做了较多的支持，随着swift的普及，在iOS社区，函数式编程被越来越多的开发者所接受。并且因为函数式编程的一些优点，也越来越多的语言开始支持函数式的开发范式。 因为最近也在项目中开始实践函数式编程，也能逐渐感受到函数式强大之处。目前也有一点心得，本文就谈下自己对函数式编程的理解。​不过在开始之前，先推荐个小段子：好久不见">
 <meta name="twitter:image" content="https://iweiyun.github.io/images/swift-functional/1542568661_33.png">
 
 
@@ -347,7 +347,7 @@
                 
               
 
-              <time title="Created: 2018-11-19 20:16:54 / Modified: 21:09:09" itemprop="dateCreated datePublished" datetime="2018-11-19T20:16:54+08:00">2018-11-19</time>
+              <time title="Created: 2018-11-19 20:16:54 / Modified: 21:36:54" itemprop="dateCreated datePublished" datetime="2018-11-19T20:16:54+08:00">2018-11-19</time>
             
 
             
@@ -389,8 +389,8 @@
       
 
       
-        <p>开始之前，先推荐个小段子：<a href="http://m.youku.com/video/id_XMzUwMzg4NDAyNA==.html?spm=a2h0k.8191407.0.0&amp;source=&amp;sharetype=2&amp;from=groupmessage&amp;isappinstalled=0" target="_blank" rel="noopener">好久不见</a><br>​<br>以前在iOS上，除了RAC，比较少有函数式编程方面的实践。swift对函数式做了较多的支持，随着swift的普及，在iOS社区，函数式编程被越来越多的开发者所接受。并且因为函数式编程的一些优点，也越来越多的语言开始支持函数式的开发范式。</p>
-<p>因为最近也在项目中开始实践函数式编程，也能逐渐感受到函数式强大之处。目前也有一点心得，本文就谈下自己对函数式编程的理解。</p>
+        <p>以前在iOS上，除了RAC，比较少有函数式编程方面的实践。swift对函数式做了较多的支持，随着swift的普及，在iOS社区，函数式编程被越来越多的开发者所接受。并且因为函数式编程的一些优点，也越来越多的语言开始支持函数式的开发范式。</p>
+<p>因为最近也在项目中开始实践函数式编程，也能逐渐感受到函数式强大之处。目前也有一点心得，本文就谈下自己对函数式编程的理解。<br>​<br>不过在开始之前，先推荐个小段子：<a href="http://m.youku.com/video/id_XMzUwMzg4NDAyNA==.html?spm=a2h0k.8191407.0.0&amp;source=&amp;sharetype=2&amp;from=groupmessage&amp;isappinstalled=0" target="_blank" rel="noopener">好久不见</a></p>
 <p>​        </p>
 <hr>
 <h3 id="编程范式"><a href="#编程范式" class="headerlink" title="编程范式"></a>编程范式</h3><p>在讲函数式编程之前，我们先来看看这两大编程范式：</p>
@@ -468,15 +468,19 @@
 <p>​    </p>
 <hr>
 <h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><ul>
-<li>纯函数的引用透明</li>
-</ul>
-<p>引用透明网上有很多种解释，函数式里，是指函数运行的结果与函数本身，是可以互相替代的。显然纯函数是具有引用透明性的，所以可以延迟执行而不影响结果，这是lazy能正确执行的理论前提。这里给出一个比较有意思的lazy filter的实现：<br><img src="/images/swift-functional/1542626381_77.png" alt="LazyArray"></p>
-<ul>
-<li>记忆<br>可以简单的对纯函数进行缓存，提高性能。<br>Swift里虽然没有内建的实现，但是自己实现一个也很简单：<br><img src="/images/swift-functional/1542626458_75.png" alt="memorize"><br>生产环境使用时还要考虑内存占用、淘汰等。</li>
-<li>递归代替迭代<br><img src="/images/swift-functional/1542626659_3.png" alt="递归"><br>这里实现的是“每隔1、2、3、4……个数，取一个数”。<br>不能使用var时，我们需要将迭代换成递归实现。好处就不再赘述了，并且符合函数式的原则。<br>这里需要注意的是要用上尾递归，防止爆栈。<br>然而我在swift上测试时，还是出现了爆栈的情况，网上查了资料说是swift不保证尾递归优化，好吧……</li>
-<li>let的性能问题<br><img src="/images/swift-functional/1542627283_39.png" alt="插入百万数据"><br><img src="/images/swift-functional/1542627287_75.png" alt="将十个数据插入百万元素的字典"><br>纯函数式语言大概是不会出现这样的情况的，运行时的优化，数据结构的高度优化，结果应该是跟用var差不多的性能才对。至少以我的知识，都能实现一个插入时间复杂度为O(log n)的不可变字典。<br>swift估计是没有做这方面的优化，赋值给var时应该是发生了拷贝。并且let的dict也没有插入一个值，返回一个新let dict的方法。</li>
-<li>运算符重载<br><img src="/images/swift-functional/1542627988_47.png" alt="运算符重载"></li>
-<li>ReactiveX</li>
+<li><p>纯函数的引用透明<br>引用透明网上有很多种解释，函数式里，是指函数运行的结果与函数本身，是可以互相替代的。显然纯函数是具有引用透明性的，所以可以延迟执行而不影响结果，这是lazy能正确执行的理论前提。</p>
+<p>这里给出一个比较有意思的lazy filter的实现：<br><img src="/images/swift-functional/1542626381_77.png" alt="LazyArray"></p>
+</li>
+<li><p>记忆<br>可以简单的对纯函数进行缓存，提高性能。<br>Swift里虽然没有内建的实现，但是自己实现一个也很简单：<br><img src="/images/swift-functional/1542626458_75.png" alt="memorize"><br>生产环境使用时还要考虑内存占用、淘汰等。</p>
+</li>
+<li><p>递归代替迭代<br><img src="/images/swift-functional/1542626659_3.png" alt="递归"><br>这里实现的是“每隔1、2、3、4……个数，取一个数”。<br>不能使用var时，我们需要将迭代换成递归实现。好处就不再赘述了，并且符合函数式的原则。<br>这里需要注意的是要用上尾递归，防止爆栈。<br>然而我在swift上测试时，还是出现了爆栈的情况，网上查了资料说是swift不保证尾递归优化，好吧……</p>
+</li>
+<li><p>let的性能问题<br><img src="/images/swift-functional/1542627283_39.png" alt="插入百万数据"><br><img src="/images/swift-functional/1542627287_75.png" alt="将十个数据插入百万元素的字典"><br>纯函数式语言大概是不会出现这样的情况的，运行时的优化，数据结构的高度优化，结果应该是跟用var差不多的性能才对。至少以我的知识，都能实现一个插入时间复杂度为O(log n)的不可变字典。<br>swift估计是没有做这方面的优化，赋值给var时应该是发生了拷贝。并且let的dict也没有插入一个值，返回一个新let dict的方法。</p>
+</li>
+<li><p>运算符重载<br><img src="/images/swift-functional/1542627988_47.png" alt="运算符重载"></p>
+</li>
+<li><p>ReactiveX</p>
+</li>
 </ul>
 <p>将Async、Lazy、Multi-threading版本的函数式工具，引入了面向对象编程，非常值得使用。</p>
 <p>​    </p>
