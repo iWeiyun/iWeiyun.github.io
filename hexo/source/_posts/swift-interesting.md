@@ -8,11 +8,7 @@ tags: swift
 ​	
 
 ---
-
 ​	
-
-
-
 ### 自定义运算符不仅限于Ascii符号
 
 ```swift
@@ -25,14 +21,8 @@ r = 1 ❤ 5	// 结果是6
 
 ​	
 
-
-
 ------
-
 ​	
-
-
-
 ### 空集合，是无法判断出有效类型的
 
 ```swift
@@ -44,14 +34,8 @@ if arr is [String] {
 
 ​	
 
-
-
 ------
-
 ​	
-
-
-
 ### 可变参数，在函数内部就是数组
 
 ```swift
@@ -65,14 +49,8 @@ test(params: "1", "2")
 
 ​	
 
-
-
 ------
-
 ​	
-
-
-
 ### Optional类型，也是有map方法的
 
 ```swift
@@ -85,12 +63,8 @@ print(r)	// Optional(11)
 
 ​	
 
-
-
 ------
-
 ​	
-
 ### 闭包仅能推断出单表达式的返回值
 
 ```swift
@@ -113,9 +87,7 @@ print(r)	// Optional(11)
 ​	
 
 ------
-
 ​	
-
 ### print是有更多参数可用的
 
 ```swift
@@ -132,14 +104,8 @@ print("World")
 
 ​	
 
-
-
 ------
-
 ​	
-
-
-
 ### ~= 可以很方便判断值是否在区间内
 
 ```swift
@@ -149,14 +115,8 @@ print(r)	// 输出：true
 
 ​	
 
-
-
 ------
-
 ​	
-
-
-
 ### switch判断，可以更强大
 
 case后面跟可以不同类型，但需要重载 ~= 运算符
@@ -181,14 +141,8 @@ default:
 
 ​	
 
-
-
 ------
-
 ​	
-
-
-
 ### 空元组，可以在不关心类型及数据时使用
 
 ```swift
@@ -199,11 +153,7 @@ emptyTuple(())	// 调用时也需要传入空元组
 ```
 
 在Rx中，是有大量这样的使用，比如事件通知，不需要传数据，只要触发一下的情况，可能会用()
-
 ​	
-
-
-
 Swift中，Void也是用的空元组来定义的
 
 ```swift
@@ -212,14 +162,8 @@ public typealias Void = ()
 
 ​	
 
-
-
 ------
-
 ​	
-
-
-
 ### 一起遍历两个Sequence时，可以用zip
 
 ```swift
@@ -232,14 +176,22 @@ for (a, b) in zip(lst1, lst2) {
 
 ​	
 
+---
+​	
+### 元组是可以定义标签的
 
-
-------
+```swift
+var tuple: (first: Int, second: String, third: String?) = (0, "", nil)
+tuple.first = 1
+tuple.second = "hello"
+tuple.third = "world"
+print(tuple.first)	// 输出1
+```
 
 ​	
 
-
-
+------
+​	
 ### 全局变量默认就是lazy的
 
 ```swift
@@ -254,14 +206,8 @@ var globalVar = globalFunc()	// 只有globalVar被使用时，globalFunc才会�
 
 ​	
 
-
-
 ------
-
 ​	
-
-
-
 ### precondition，比assert更严格的检查
 
 用法上与assert类似，但更严格，只有-Ounchecked选项才能关闭，但这样会很危险
@@ -272,14 +218,8 @@ precondition(x >= 0)
 
 ​	
 
-
-
 ------
-
 ​	
-
-
-
 ### struct在没有自定义init时，系统会帮我们生成
 
 ```swift
@@ -293,14 +233,8 @@ let s2 = MySize()	// 如果上面没有指定默认值，则不会生成这个�
 
 ​	
 
-
-
 ------
-
 ​	
-
-
-
 ### compactMap可以从列表中筛选出指定类型
 
 ```swift
@@ -311,14 +245,8 @@ print(r)	// 输出：["3", "4"]
 
 ​	
 
-
-
 ------
-
 ​	
-
-
-
 ### 从Dictionary获取值时，可以提供默认值
 
 ```swift
@@ -329,14 +257,8 @@ print(o)	// 输出：2
 
 ​	
 
-
-
 ------
-
 ​	
-
-
-
 ### 运算符也是方法
 
 ```swift
