@@ -69,16 +69,16 @@ print(r)	// Optional(11)
 
 ```swift
 [1, 2, 3, 4].map { item in	// Error: Unable to infer complex closure return type
-	let r = item * item
-	return r + 1
+    let r = item * item
+    return r + 1
 }
 ```
 
 只有改成如下形式才能编译通过
 
 ```swift
-[1, 2, 3, 4].map { item in	// Error: Unable to infer complex closure return type
-	item * item + 1
+[1, 2, 3, 4].map { item in
+    item * item + 1
 }
 ```
 
