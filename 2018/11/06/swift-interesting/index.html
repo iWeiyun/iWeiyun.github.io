@@ -114,7 +114,7 @@
 <meta property="og:site_name" content="微云iOS团队">
 <meta property="og:description" content="​      ​     自定义运算符不仅限于Ascii符号123infix operator ❤ : MultiplicationPrecedencefunc ❤(lhs: Int, rhs: Int) -&amp;gt; Int &amp;#123; return lhs + rhs &amp;#125;r = 1 ❤ 5	// 结果是6 除了❤，类似☢、☂、☯等都可以用，而且这些符号都是可以组合起来的 ​">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-11-21T02:31:08.174Z">
+<meta property="og:updated_time" content="2018-11-29T10:36:35.925Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="你可能不知道的Swift">
 <meta name="twitter:description" content="​      ​     自定义运算符不仅限于Ascii符号123infix operator ❤ : MultiplicationPrecedencefunc ❤(lhs: Int, rhs: Int) -&amp;gt; Int &amp;#123; return lhs + rhs &amp;#125;r = 1 ❤ 5	// 结果是6 除了❤，类似☢、☂、☯等都可以用，而且这些符号都是可以组合起来的 ​">
@@ -350,7 +350,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2018-11-21 10:31:08" itemprop="dateModified" datetime="2018-11-21T10:31:08+08:00">2018-11-21</time>
+                <time title="Modified: 2018-11-29 18:36:35" itemprop="dateModified" datetime="2018-11-29T18:36:35+08:00">2018-11-29</time>
               
             
           </span>
@@ -408,9 +408,9 @@
 <p>​    </p>
 <hr>
 <p>​    </p>
-<h3 id="闭包仅能推断出单表达式的返回值"><a href="#闭包仅能推断出单表达式的返回值" class="headerlink" title="闭包仅能推断出单表达式的返回值"></a>闭包仅能推断出单表达式的返回值</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>].<span class="built_in">map</span> &#123; item <span class="keyword">in</span>	<span class="comment">// Error: Unable to infer complex closure return type</span></span><br><span class="line">	<span class="keyword">let</span> r = item * item</span><br><span class="line">	<span class="keyword">return</span> r + <span class="number">1</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="闭包仅能推断出单表达式的返回值"><a href="#闭包仅能推断出单表达式的返回值" class="headerlink" title="闭包仅能推断出单表达式的返回值"></a>闭包仅能推断出单表达式的返回值</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>].<span class="built_in">map</span> &#123; item <span class="keyword">in</span>	<span class="comment">// Error: Unable to infer complex closure return type</span></span><br><span class="line">    <span class="keyword">let</span> r = item * item</span><br><span class="line">    <span class="keyword">return</span> r + <span class="number">1</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>只有改成如下形式才能编译通过</p>
-<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>].<span class="built_in">map</span> &#123; item <span class="keyword">in</span></span><br><span class="line">	item * item + <span class="number">1</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>].<span class="built_in">map</span> &#123; item <span class="keyword">in</span></span><br><span class="line">    item * item + <span class="number">1</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>单表达式时，return关键字也可以省略</p>
 <p>​    </p>
 <hr>
