@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next mist" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="​    项目近期选择使用Electron来实现跨平台桌面客户端，并考虑将已经被多平台使用的WeiyunSDK、RESTfulSDK作为native扩展库引入。Node.js本身支持c++实现native addon插件，将原生c++接口封装供js调用。 ​    Node.js目前有两套API可以供c++侧选择来实现v8接口的封装，NAN和N-API。NAN是受到广泛认可（包括Node官方）的三">
+<meta name="keywords" content="node,addon,electron,微云">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Node.js C++ Addon在微云Electron跨平台端中的实践与应用">
+<meta property="og:url" content="https://iweiyun.github.io/2018/12/12/node-cpp-addon-in-weiyun/index.html">
+<meta property="og:site_name" content="微云iOS团队">
+<meta property="og:description" content="​    项目近期选择使用Electron来实现跨平台桌面客户端，并考虑将已经被多平台使用的WeiyunSDK、RESTfulSDK作为native扩展库引入。Node.js本身支持c++实现native addon插件，将原生c++接口封装供js调用。 ​    Node.js目前有两套API可以供c++侧选择来实现v8接口的封装，NAN和N-API。NAN是受到广泛认可（包括Node官方）的三">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://iweiyun.github.io/images/electron-cpp-addon/001.png">
+<meta property="og:image" content="https://iweiyun.github.io/images/electron-cpp-addon/002.png">
+<meta property="og:updated_time" content="2018-12-12T05:51:43.138Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Node.js C++ Addon在微云Electron跨平台端中的实践与应用">
+<meta name="twitter:description" content="​    项目近期选择使用Electron来实现跨平台桌面客户端，并考虑将已经被多平台使用的WeiyunSDK、RESTfulSDK作为native扩展库引入。Node.js本身支持c++实现native addon插件，将原生c++接口封装供js调用。 ​    Node.js目前有两套API可以供c++侧选择来实现v8接口的封装，NAN和N-API。NAN是受到广泛认可（包括Node官方）的三">
+<meta name="twitter:image" content="https://iweiyun.github.io/images/electron-cpp-addon/001.png">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="微云iOS团队" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="https://iweiyun.github.io/2018/12/12/node-cpp-addon-in-weiyun/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Node.js C++ Addon在微云Electron跨平台端中的实践与应用 | 微云iOS团队</title>
+  
+
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?75b2f2884a5033937b5cfdebf2ebce39";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">微云iOS团队</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://iweiyun.github.io/2018/12/12/node-cpp-addon-in-weiyun/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Weiyun Developer">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="微云iOS团队">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Node.js C++ Addon在微云Electron跨平台端中的实践与应用
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2018-12-12 13:51:02 / Modified: 13:51:43" itemprop="dateCreated datePublished" datetime="2018-12-12T13:51:02+08:00">2018-12-12</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          <span> ｜ </span>
+          <span class="fa fa-user-o"> </span>
+          <span style="color:#222;"> farren</span>
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>​    项目近期选择使用Electron来实现跨平台桌面客户端，并考虑将已经被多平台使用的WeiyunSDK、RESTfulSDK作为native扩展库引入。Node.js本身支持c++实现native addon插件，将原生c++接口封装供js调用。</p>
+<p>​    Node.js目前有两套API可以供c++侧选择来实现v8接口的封装，NAN和N-API。NAN是受到广泛认可（包括Node官方）的三方接口层，内部兼容各种Node版本v8接口的变动，对外提供稳定的API，免去长期以来c++开发者升级node版本需要频繁兼容c++接口的苦恼；N-API则是Node官方自行推出的新接口层，并非取代原有接口，而是旨在提供更稳定更贴近c风格的API，同样是为了避免c++开发者频繁改动，更利于生态圈的发展。由于我们在启动Electron版本的计划时，Electron的稳定版本使用的8.9.x版本的Node.js，该版本的官方文档中，N-API还处于实验阶段，权衡之后，我们还是选择近来成熟稳定的NAN来为我们electron桌面端提供native封装模块。</p>
+<h3 id="NAN与v8"><a href="#NAN与v8" class="headerlink" title="NAN与v8"></a>NAN与v8</h3><p>​    nan的引入也十分方便，根据nan的官方文档，只需要通过npm在工程目录下安装即可</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm init</span><br><span class="line">npm install --save nan <span class="comment">#--save和--save-dev可以省掉手动修改package.json文件的步骤</span></span><br></pre></td></tr></table></figure>
+<p>​    Node.js c++ addon和nan的基本用法和封装示例均可以在 <a href="https://github.com/nodejs/node-addon-examples" target="_blank" rel="noopener">https://github.com/nodejs/node-addon-examples</a> 和Node.js官方文档中找到，跟着走一遍基本就可以对整个封装的过程有个直观的了解，请务必好好看一下。简单提一些可能涉及到的概念。</p>
+<h4 id="Isolate"><a href="#Isolate" class="headerlink" title="Isolate"></a>Isolate</h4><p>​    代表V8引擎的一个实例。不同的Isolate实例之间状态无交集、不共享。V8引擎被初始化时，就默认创建一个Isolate。一个Isolate在任何时侯都只允许一个线程运行，它是一个独立的V8运行时或者一个独立的V8执行环境，拥有自己的堆管理器、垃圾回收器等</p>
+<h4 id="Handle和HandleScope"><a href="#Handle和HandleScope" class="headerlink" title="Handle和HandleScope"></a>Handle和HandleScope</h4><p>​    V8中，使用Handle类型托管JavaScript对象，Handle类型间的赋值都是直接传递对象的引用。JavaScript类型在c++中都存在对应的类，c++中使用这些类时，不能在一般的栈或堆中使用，必须托管给Handle类型，使用V8自己的垃圾回收机制来管理。</p>
+<p>​    Handle是一个模板类，有两种类型，Local Handle和Persistent Handle。</p>
+<p>​    Local Handle在栈上分配，其生命周期取决于HandleScope。HandleScope常在一个函数开始时被创建，而HandleScope被析构时，GC将析构该HandleScope中的全部Handle引用的对象。这里Handle的栈，虽然不属于常规意义的C++栈，但HandleScope本身只能分配在栈上，受C++作用域的限制，一般而言，当代码离开HandleScope所在的c++作用域，Handle的生命周期也将结束。因此HandleScope更像是一个Local Handle的容器，用于批量移除不需要的Local Handle。</p>
+<p>​    Persistent Handle提供一个堆上分配的JavaScript对象的引用，只能显式移除。类似全局变量，如果需要在不止一个函数中使用某个对象，HandleScope本身受限于c++作用域无法满足要求，此时想要保持对某对象的引用，只能使用Persistent Handle。</p>
+<h4 id="Context"><a href="#Context" class="headerlink" title="Context"></a>Context</h4><p>​    V8中的JavaScript代码具有自己的运行上下文，Persistent Handle的全局性也是相对于当前上下文来说的，使用时需要显示指定所在的Context。每个Context拥有自己的global proxy object，所有的Persistent Handle都是该global proxy object的属性。Context可以看作一种作用域。</p>
+<h3 id="分代垃圾回收Generational-GC"><a href="#分代垃圾回收Generational-GC" class="headerlink" title="分代垃圾回收Generational GC"></a>分代垃圾回收Generational GC</h3><p>​    简单提一下v8的垃圾回收策略，本来觉得没必要提的，但想着之前画了些图，不贴出来的话也是浪费了当时逝去的青春…</p>
+<p><img src="/images/electron-cpp-addon/001.png" alt=""></p>
+<p>​    v8的GC机制，基于弱分代假设，将堆进行了分代。</p>
+<h4 id="新生代"><a href="#新生代" class="headerlink" title="新生代"></a>新生代</h4><p>​    新生代用于对象的分配，容量较小，大约只有几MB。Js中总有些根对象，如果从这些根对象开始沿着引用遍历完毕还不能访问到的对象，就需要被回收。一个v8对象最初被创建时是按顺序被分配在新生代区里的。有一个指针指向该新生代区下一个可分配区域，如果该指针到达了新生代区的末端，则开始了一次独立的清理过程，清除已死对象，为还活着的对象的生存时间计数。这种清理实际上非常频繁，对清理速度要求很高，因此v8采用了Scavenge算法，这是一种停止-复制(stop-and-copy)算法。具体做法是新生代被分为from和to两个子空间，从新生代区分配内存到触发清理都只发生在from空间内。当清理机制被触发，from空间内存活对象被复制到to空间中，然后一次性释放整个from空间。同时，to空间会检查存活对象的内存占比，如果过高，则会将经历多次回收仍存活的对象复制到老生代区中。接着，from和to子空间的指责互换。</p>
+<p><img src="/images/electron-cpp-addon/002.png" alt=""></p>
+<h4 id="老生代"><a href="#老生代" class="headerlink" title="老生代"></a>老生代</h4><p>​    老生代容量很大，其中大部分对象长时间保持存活状态，此时再考虑stop-and-copy算法就懵圈了，回收效率将大幅下降。故老生代区主要采用标记-清除(Mark-Sweep)和标记-压缩(Mark-Compact)算法相结合的方式进行回收。大体分为两个阶段：</p>
+<ul>
+<li>标记阶段，从根对象开始沿引用进行深度优先搜索，对所有对象进行白灰黑三色标记。黑色表示对象本身强引用，并已经处理该对象所有子引用；灰色表示对象本身强引用，还未处理完对象中的子引用，白色为不可达的死对象。</li>
+<li>清除/压缩阶段，调整全部存活对象位置，整理内存碎片，清除死对象，释放空闲内存。</li>
+</ul>
+<p>​    尽管采用了上述方式，GC时应用程序还是需要停止等待回收完毕，当程序堆内存在大量存活对象时，仍然变得性能很差。所以实际中，v8还引入了增量标记和惰性清理机制。增量标记相比于普通标记而言，另外维护一个表记录所有黑色对象指向白色对象的指针，内存增量超过阈值就激活增量标记功能，将这类对象及时染成灰色进行扫描。惰性清理则是不猴急地清理全部死对象，可以将部分清理工作延期清理。</p>
+<p>​    这里只是为了青春简单地一提，若想了解内存管理具体详情，本文最后贴出了相关链接。</p>
+<p>​    接下来终于进入正题了，贴代码总是胜过千言万语。尽管有了官方详尽而有人性化的教程，但总是有些过于简单，实际应用中仍然可能会遇到不少问题，将其中一些比较关键的部分整理一下。</p>
+<h3 id="通过libuv异步回调js主线程"><a href="#通过libuv异步回调js主线程" class="headerlink" title="通过libuv异步回调js主线程"></a>通过libuv异步回调js主线程</h3><p>​    node.js是单线程的，网络及数据库异步请求的回包，需要在v8引擎主线程才能执行js回调方法。v8引擎底层依赖libuv实现了异步事件的循环和分发。libuv主要维护了一系列event loop，js代码均执行在默认主循环uv_default_loop中，native addon执行js回调都需要抛到该loop中执行，并且避免在uv_default_loop中执行耗时操作。</p>
+<p>​    因此，需要封装一个单独的类用于将所有异步任务传递给uv_default_loop。实现如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">AsyncHandleData</span> &#123;</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">list</span>&lt;<span class="built_in">std</span>::function&lt;<span class="keyword">void</span>()&gt;&gt; taskList;</span><br><span class="line">    <span class="built_in">std</span>::recursive_mutex mtx;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WeiyunV8TaskService</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    WeiyunV8TaskService() &#123;</span><br><span class="line">        _async.data = <span class="keyword">new</span> AsyncHandleData;</span><br><span class="line">        uv_async_init(uv_default_loop(), &amp;_async, [](<span class="keyword">uv_async_t</span> *handle)&#123;</span><br><span class="line">            AsyncHandleData *handleData = (AsyncHandleData *)handle-&gt;data;</span><br><span class="line">            <span class="built_in">std</span>::<span class="built_in">list</span>&lt;<span class="built_in">std</span>::function&lt;<span class="keyword">void</span>()&gt;&gt; excuteList;</span><br><span class="line"></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="built_in">std</span>::unique_lock&lt;<span class="built_in">std</span>::recursive_mutex&gt; lock(handleData-&gt;mtx);</span><br><span class="line">                <span class="keyword">while</span> (handleData-&gt;taskList.size() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                    excuteList.push_back(handleData-&gt;taskList.front());</span><br><span class="line">                    handleData-&gt;taskList.pop_front();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">while</span> (excuteList.size() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                excuteList.front()();</span><br><span class="line">                excuteList.pop_front();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ~WeiyunV8TaskService() &#123;</span><br><span class="line">        uv_close((<span class="keyword">uv_handle_t</span> *)&amp;_async, <span class="literal">nullptr</span>);</span><br><span class="line">        <span class="keyword">delete</span> (AsyncHandleData *)_async.data;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Func, <span class="keyword">typename</span>... Args&gt;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">defaultLoopAsync</span><span class="params">(Func&amp;&amp; f, Args&amp;&amp;... args)</span> </span>&#123;</span><br><span class="line">        </span><br><span class="line">        <span class="built_in">std</span>::function&lt;<span class="keyword">void</span>()&gt; task = [=]() &#123;</span><br><span class="line">            f(args...);</span><br><span class="line">        &#125;;</span><br><span class="line">        AsyncHandleData *handleData = (AsyncHandleData *)_async.data;</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">std</span>::unique_lock&lt;<span class="built_in">std</span>::recursive_mutex&gt; lock(handleData-&gt;mtx);</span><br><span class="line">            handleData-&gt;taskList.push_back(task);</span><br><span class="line">        &#125;</span><br><span class="line">        uv_async_send(&amp;_async);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">uv_async_t</span> _async;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>​    首先，在WeiyunV8TaskService的构造方法中创建一个uv_async_t类型的异步句柄，该句柄大概的结构如下。 </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//libuv - uv.h</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">uv_async_t</span> &#123;</span></span><br><span class="line">  <span class="comment">/* public */</span>                                                                </span><br><span class="line">  <span class="keyword">void</span>* data;       <span class="comment">//携带数据</span></span><br><span class="line">  <span class="comment">/* read-only */</span>    </span><br><span class="line">  <span class="keyword">uv_loop_t</span>* loop;    <span class="comment">//绑定执行loop</span></span><br><span class="line">  uv_handle_type type;  </span><br><span class="line">  <span class="comment">/* private */</span>   </span><br><span class="line">  uv_async_cb async_cb;     </span><br><span class="line">  <span class="keyword">int</span> pending;  </span><br><span class="line">  ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>​    句柄的data变量是唯一公开可以读写的数据字段，用于在不同循环间传递数据。在_async中，我们写入一个队列，存储native层回来的异步操作。</p>
+<p>​    接着调用uv_async_init()方法分别将js的主循环uv_default_loop和传入的callback绑定到句柄_async的loop和async_cb变量上。</p>
+<p>​    当有异步任务回来时，通过成员方法defaultLoopAsync()来切到js的主线程。该方法往_async的data里写入新的数据，并执行uv_async_send()方法，通知libuv的eventloop在主循环处理。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//libuv - async.c</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">uv_async_send</span><span class="params">(<span class="keyword">uv_async_t</span>* handle)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (ACCESS_ONCE(<span class="keyword">int</span>, handle-&gt;pending) != <span class="number">0</span>)</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (cmpxchgi(&amp;handle-&gt;pending, <span class="number">0</span>, <span class="number">1</span>) == <span class="number">0</span>)</span><br><span class="line">    uv__async_send(handle-&gt;loop);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>​    由于网络和数据库层异步回调可能非常频繁，短时间内多次调用uv_async_send()方法，并不会获得相应次数的执行机会。查看uv_async_send()接口的实现，当handle本身的pending值还是非0值，就表明之前的发送事件并未得到处理，因此不会得到机会执行uv__async_send()这个内部接口来驱动目标loop。就因为这个机制，只能保证若有N个异步事件发送，至少能得到一次执行async_cb回调的机会。因为，我们需要自己维护一个队列，来保证每次触发时，native内所有发送的回调都能得到执行。</p>
+<h3 id="异步js回调与Persistent-Handle"><a href="#异步js回调与Persistent-Handle" class="headerlink" title="异步js回调与Persistent Handle"></a>异步js回调与Persistent Handle</h3><p>​    解决了addon异步回调到js主线程的问题，还需要考虑的就是在执行js传递下来的的callback函数了。addon所有注册给js调用的接口，都只有一个v8::FunctionCallbackInfo\<a href="v8::Value\" target="_blank" rel="noopener">v8::Value\</a>类型的参数，所有js实际传递的参数、返回值的引用及JS对象本身的引用都被包含在内。</p>
+<p>​    js调用接口时传递的参数通过info[i]即可依次获取，一般进行类型检查后，即可转换成对应的Local Handle对象。前面提到过，在创建Local Handle对象前，需要声明一个HandleScope，用来管理这些Local Handle对象的生命周期。当HandleScope离开函数作用域而被销毁时，会回收所有Local Handle对象，自然包括js传下来的v8::Function类型的回调函数。这里需要用一个Persistent Handle对象来延长该闭包的生命周期，v8::Persistent\<t>默认是NonCopyablePersistentTraits，禁用了拷贝构造，无法直接被lambda值捕获，只能传递v8::Persistent\<a href="v8::Function\" target="_blank" rel="noopener">v8::Function\</a>的指针；同时，NonCopyablePersistentTraits析构时不会主动为内存中对象染色，所以这里还需要传递一个deleter给智能指针，在析构时调用Reset()方法，便于v8的GC适时销毁这个persistent对象。</t></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">NAN_METHOD(WeiyunSDK::fetchSomething) &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(info[<span class="number">0</span>]-&gt;IsNullOrUndefined() || !info[<span class="number">1</span>]-&gt;IsFunction()) &#123;</span><br><span class="line">        Nan::ThrowError(<span class="string">"invalid parameters"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    Nan::HandleScope scope;</span><br><span class="line">    std::string dirkey(BIN(*v8::String::Utf8Value(info[0])));</span><br><span class="line">    v8::Local&lt;v8::Function&gt; callback = v8::Local&lt;v8::Function&gt;::Cast(info[<span class="number">1</span>]);</span><br><span class="line">    <span class="keyword">auto</span> persistentCallback = <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Nan::Persistent&lt;v8::Function&gt; &gt;(<span class="keyword">new</span> Nan::Persistent&lt;v8::Function&gt;(callback),[](Nan::Persistent&lt;v8::Function&gt; * callback)  &#123;</span><br><span class="line">        callback-&gt;Reset();</span><br><span class="line">        <span class="keyword">delete</span> callback;</span><br><span class="line">    &#125;);</span><br><span class="line">    xpWeiyunSDK::sharedInstance()-&gt;fetchDirList(dirkey, [=] (<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; dirkey, DirListType dirList, <span class="keyword">int</span> errorcode) &#123;</span><br><span class="line">        service-&gt;defaultLoopAsync([=]()&#123;</span><br><span class="line">            Nan::HandleScope scope;</span><br><span class="line">            <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;v8::Local&lt;v8::Value&gt;&gt; argv;</span><br><span class="line">            argv.emplace_back(Nan::New(errorcode));</span><br><span class="line"></span><br><span class="line">            v8::Local&lt;v8::Array&gt; dirAddArray = Nan::New&lt;v8::Array&gt;();</span><br><span class="line">            <span class="keyword">int</span> index = <span class="number">0</span>;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">auto</span> item : *dirList) &#123;</span><br><span class="line">            	dirAddArray-&gt;Set(index++, wyv8::DirItem::newInstance(item));</span><br><span class="line">            &#125;</span><br><span class="line">            argv.emplace_back(dirAddArray);</span><br><span class="line">            argv.emplace_back(Nan::New(errorcode));</span><br><span class="line">            </span><br><span class="line">            persistentCallback-&gt;Get(v8::Isolate::GetCurrent())-&gt;Call(Nan::GetCurrentContext()-&gt;Global(), argv.size(), argv.data());</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Local-Handle作为返回值"><a href="#Local-Handle作为返回值" class="headerlink" title="Local Handle作为返回值"></a>Local Handle作为返回值</h3><p>​    我们知道Local Handle的生命周期被容器Handle Scope管理，意味着当我们需要将Local Handle作为返回值传递时，由于Handle Scope被析构，内部所有Local Handle包括当前的返回值都随时会被GC清理。</p>
+<p>​    但是，就如下文会提到为自定义数据结构进行封装时，不可避免地会将Local Handle作为返回值处理。这个时候，我们需要用一种EscapableHandleScope来管理这些Local Handle，这种Scope允许Local Handle“逃离”自己的管理。通过Escape()方法，将要”逃离”的参数拷贝到一个封闭的scope中，之后当前的EscapableHandleScope仍然会标记其内部所有Local Handle继而被GC清理，实际返回刚才的副本。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">v8::Local&lt;v8::Value&gt; FileItem::newInstance() &#123;</span><br><span class="line">	Nan::EscapableHandleScope scope;</span><br><span class="line">	v8::Local&lt;v8::Function&gt; cons = Nan::New&lt;v8::Function&gt;(constructor);</span><br><span class="line">	<span class="keyword">return</span> scope.Escape(cons-&gt;NewInstance(Nan::GetCurrentContext()).ToLocalChecked());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="自定义数据结构的v8封装"><a href="#自定义数据结构的v8封装" class="headerlink" title="自定义数据结构的v8封装"></a>自定义数据结构的v8封装</h3><p>​    除了常见的一些基本数据类型，不可避免需要自定义数据结构，比如这样的一个pb结构对应的c++类。</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// weiyun_lite_message.proto</span><br><span class="line">message FileItem &#123;</span><br><span class="line">    optional string filename         = 2;   //名称</span><br><span class="line">    optional FileExtInfo ext_info    = 21;  //扩展信息</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>​    为了包装成js可以直接调用的类，我们包装的类均需要继承ObjectWrap类。由于业务中，考虑到addon内存缓存可能会有上万条数据被返回给js层的场景，为了避免内存突然翻倍，我们在为这些pb数据封装v8结构时，均利用智能指针直接引用并管理内存中已有数据，js层涉及所有的成员操作均提供setter和getter方法，减免数据的拷贝。另外，还提供jsObject()和parseJsObject()方法，可以在由js层主动调用完成pb类和json格式的js类之间互相转换（转换时每条item的内存会翻倍）。比如展示20条数据，那么就惰性转换这20条数据，有效减轻内存峰值压力。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// WeiyunV8Item.hpp</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FileItem</span>:</span> <span class="keyword">public</span> Nan::ObjectWrap &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Init</span><span class="params">(v8::Handle&lt;v8::Object&gt; exports)</span></span>;</span><br><span class="line">	<span class="keyword">static</span> v8::Local&lt;v8::Value&gt; newInstance();</span><br><span class="line">	<span class="keyword">static</span> v8::Local&lt;v8::Value&gt; newInstance(weiyun::FileItem *data);</span><br><span class="line">	<span class="keyword">static</span> v8::Local&lt;v8::Value&gt; newInstance(<span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;weiyun::FileItem&gt; data);</span><br><span class="line">	<span class="keyword">static</span> v8::Local&lt;v8::Value&gt; newInstance(<span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;::google::protobuf::MessageLite&gt; holder, weiyun::FileItem *data);</span><br><span class="line">    </span><br><span class="line">	<span class="keyword">static</span> v8::Local&lt;v8::Object&gt; jsObject(<span class="keyword">const</span> weiyun::FileItem&amp; data);</span><br><span class="line">	<span class="keyword">static</span> weiyun::<span class="function">FileItem *<span class="title">parseJsObject</span><span class="params">(v8::Local&lt;v8::Object&gt; jsObject)</span></span>;</span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	FileItem();</span><br><span class="line">	FileItem(weiyun::FileItem *data);</span><br><span class="line">	~FileItem() &#123;&#125;;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">static</span> Nan::Persistent&lt;v8::Function&gt; constructor;  <span class="comment">//js contructor - persistant</span></span><br><span class="line">	<span class="function"><span class="keyword">static</span> <span class="title">NAN_METHOD</span><span class="params">(toJsObject)</span></span>;</span><br><span class="line">	<span class="function"><span class="keyword">static</span> <span class="title">NAN_METHOD</span><span class="params">(New)</span></span>;</span><br><span class="line">    </span><br><span class="line">	<span class="function"><span class="keyword">static</span> <span class="title">NAN_METHOD</span><span class="params">(ext_info)</span></span>;</span><br><span class="line">	<span class="function"><span class="keyword">static</span> <span class="title">NAN_METHOD</span><span class="params">(set_ext_info)</span></span>;</span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	weiyun::FileItem *_proto_data;</span><br><span class="line">	<span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;::google::protobuf::MessageLite&gt; _proto_holder;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// WeiyunV8Item.cpp</span></span><br><span class="line"></span><br><span class="line">Nan::Persistent&lt;v8::Function&gt; FileItem::constructor;</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line">    </span><br><span class="line">FileItem::FileItem(weiyun::FileItem *data) &#123;</span><br><span class="line">	<span class="keyword">this</span>-&gt;_proto_data = data;</span><br><span class="line">	<span class="keyword">this</span>-&gt;_proto_holder = <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;weiyun::FileItem&gt;(<span class="keyword">this</span>-&gt;_proto_data);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> FileItem::Init(v8::Handle&lt;v8::Object&gt; exports) &#123;</span><br><span class="line">	Nan::HandleScope scope;</span><br><span class="line">	v8::Local&lt;v8::FunctionTemplate&gt; funcTmpl = Nan::New&lt;v8::FunctionTemplate&gt;(New);</span><br><span class="line">	funcTmpl-&gt;SetClassName(Nan::New&lt;v8::String&gt;(<span class="string">"FileItem"</span>).ToLocalChecked());</span><br><span class="line">	funcTmpl-&gt;InstanceTemplate()-&gt;SetInternalFieldCount(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">	Nan::SetPrototypeMethod(funcTmpl, <span class="string">"jsObject"</span>, jsObject);</span><br><span class="line">    Nan::SetPrototypeMethod(funcTmpl, <span class="string">"parseJsObject"</span>, parseJsObject);</span><br><span class="line">	Nan::SetPrototypeMethod(funcTmpl, <span class="string">"ext_info"</span>, ext_info);</span><br><span class="line">	Nan::SetPrototypeMethod(funcTmpl, <span class="string">"set_ext_info"</span>, set_ext_info);</span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">	constructor.Reset(funcTmpl-&gt;GetFunction());</span><br><span class="line">	exports-&gt;Set(Nan::New&lt;v8::String&gt;(<span class="string">"FileItem"</span>).ToLocalChecked(), funcTmpl-&gt;GetFunction());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">v8::Local&lt;v8::Value&gt; FileItem::newInstance() &#123;</span><br><span class="line">	Nan::EscapableHandleScope scope;</span><br><span class="line">	v8::Local&lt;v8::Function&gt; cons = Nan::New&lt;v8::Function&gt;(constructor);</span><br><span class="line">	<span class="keyword">return</span> scope.Escape(cons-&gt;NewInstance(Nan::GetCurrentContext()).ToLocalChecked());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">v8::Local&lt;v8::Value&gt; FileItem::newInstance(<span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;::google::protobuf::MessageLite&gt; holder, weiyun::FileItem *data) &#123;</span><br><span class="line">	Nan::EscapableHandleScope scope;</span><br><span class="line">	<span class="keyword">if</span> (!data) &#123; <span class="keyword">return</span> scope.Escape(Nan::Null()); &#125;</span><br><span class="line">	v8::Local&lt;v8::Function&gt; cons = Nan::New&lt;v8::Function&gt;(constructor);</span><br><span class="line">	v8::Local&lt;v8::Object&gt; obj = cons-&gt;NewInstance(Nan::GetCurrentContext()).ToLocalChecked();</span><br><span class="line">	FileItem *unwrapObj = FileItem::Unwrap&lt;FileItem&gt;(obj);</span><br><span class="line">	unwrapObj-&gt;_proto_holder = holder ? holder: <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;weiyun::FileItem&gt;(data);</span><br><span class="line">	unwrapObj-&gt;_proto_data = data;</span><br><span class="line">	<span class="keyword">return</span> scope.Escape(obj);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">weiyun::FileItem *FileItem::parseJsObject(v8::Local&lt;v8::Object&gt; jsObject) &#123;</span><br><span class="line">	<span class="keyword">auto</span> data = <span class="keyword">new</span> weiyun::FileItem;</span><br><span class="line"></span><br><span class="line">	v8::Local&lt;v8::Value&gt; ext_info_value = jsObject-&gt;Get(Nan::New&lt;v8::String&gt;(<span class="string">"ext_info"</span>).ToLocalChecked());</span><br><span class="line">	<span class="keyword">if</span> (!ext_info_value-&gt;IsNullOrUndefined()) &#123;</span><br><span class="line">		data-&gt;set_allocated_ext_info(FileExtInfo::parseJsObject(ext_info_value-&gt;ToObject()));</span><br><span class="line">	&#125;</span><br><span class="line">    ...</span><br><span class="line">    </span><br><span class="line">	<span class="keyword">return</span> data;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">v8::Local&lt;v8::Object&gt; FileItem::jsObject(<span class="keyword">const</span> weiyun::FileItem&amp; data) &#123;</span><br><span class="line">	Nan::EscapableHandleScope scope;</span><br><span class="line">	<span class="keyword">auto</span> jsObject = Nan::New&lt;v8::Object&gt;();</span><br><span class="line"></span><br><span class="line">	v8::Local&lt;v8::Value&gt; ext_info_value = data.has_ext_info() ? (v8::Local&lt;v8::Value&gt;)FileExtInfo::jsObject(data.ext_info()) : (v8::Local&lt;v8::Value&gt;)Nan::Null();</span><br><span class="line">	jsObject-&gt;Set(Nan::New&lt;v8::String&gt;(<span class="string">"ext_info"</span>).ToLocalChecked(), ext_info_value);</span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> scope.Escape(jsObject);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">NAN_METHOD(FileItem::New) &#123;</span><br><span class="line">	<span class="keyword">if</span> (info.IsConstructCall()) &#123; <span class="comment">//new Message() 调用</span></span><br><span class="line">		FileItem *obj;</span><br><span class="line">		<span class="keyword">if</span> (info[<span class="number">0</span>]-&gt;IsObject()) &#123;</span><br><span class="line">			obj = <span class="keyword">new</span> FileItem(FileItem::parseJsObject(info[<span class="number">0</span>]-&gt;ToObject()));</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			obj = <span class="keyword">new</span> FileItem();</span><br><span class="line">		&#125;</span><br><span class="line">		obj-&gt;Wrap(info.This());</span><br><span class="line">		info.GetReturnValue().Set(info.This());</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		v8::Local&lt;v8::Function&gt; cons = Nan::New&lt;v8::Function&gt;(constructor);</span><br><span class="line">		<span class="keyword">if</span> (info.Length() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">			v8::Local&lt;v8::Value&gt; argv[<span class="number">1</span>] = &#123;info[<span class="number">0</span>]&#125;;</span><br><span class="line">			info.GetReturnValue().Set(cons-&gt;NewInstance(Nan::GetCurrentContext(), <span class="number">1</span>, argv).ToLocalChecked());</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			info.GetReturnValue().Set(cons-&gt;NewInstance(Nan::GetCurrentContext()).ToLocalChecked());</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">NAN_METHOD(FileItem::jsObject) &#123;</span><br><span class="line">	Nan::HandleScope scope;</span><br><span class="line">	FileItem *holder = FileItem::Unwrap&lt;FileItem&gt;(info.Holder());</span><br><span class="line">	info.GetReturnValue().Set(FileItem::jsObject(*holder-&gt;_proto_data));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">NAN_METHOD(FileItem::set_ext_info) &#123;</span><br><span class="line">	Nan::HandleScope scope;</span><br><span class="line">	FileItem *holder = FileItem::Unwrap&lt;FileItem&gt;(info.Holder());</span><br><span class="line">	<span class="keyword">if</span> (info[<span class="number">0</span>]-&gt;IsObject()) &#123;</span><br><span class="line">		FileExtInfo *obj = FileExtInfo::Unwrap&lt;FileExtInfo&gt;(info[<span class="number">0</span>]-&gt;ToObject());</span><br><span class="line">		holder-&gt;_proto_data-&gt;mutable_ext_info()-&gt;CopyFrom(*obj-&gt;_proto_data);</span><br><span class="line">		obj-&gt;_proto_data = holder-&gt;_proto_data-&gt;mutable_ext_info();</span><br><span class="line">		obj-&gt;_proto_holder = holder-&gt;_proto_holder;</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		Nan::ThrowError(<span class="string">"the argument type must be an object"</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">NAN_METHOD(FileItem::ext_info) &#123;</span><br><span class="line">	Nan::HandleScope scope;</span><br><span class="line">	FileItem *holder = FileItem::Unwrap&lt;FileItem&gt;(info.Holder());</span><br><span class="line">	v8::Local&lt;v8::Object&gt; obj = FileExtInfo::newInstance(holder-&gt;_proto_holder, holder-&gt;_proto_data-&gt;mutable_ext_info())-&gt;ToObject();</span><br><span class="line">	info.GetReturnValue().Set(obj);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Mac平台OC-RunLoop与uv-default-loop"><a href="#Mac平台OC-RunLoop与uv-default-loop" class="headerlink" title="Mac平台OC RunLoop与uv_default_loop"></a>Mac平台OC RunLoop与uv_default_loop</h3><p>​    我们的addon中还引入了wns的framework，在mac平台下wns有相当一部分模块使用Objective-C来实现，当我们提供wnsS的Objective-C接口给js调用时，需要先用c++层包装oc接口，再进行v8层的封装。</p>
+<p>​    不过，由于wns的内部实现涉及通过GCD分发到Main Queue处理异步代码，libuv的事件系统并不会执行OC的MainRunLoop，从而会导致wns无法使用。更改并维护wns代码并不是一个很好的方案，我们选择定时在libuv的uv_default_loop中手动插入RunLoop，使wns中的分发到主线程的异步回调得到执行的机会。RunLoop插入的时间间隔由addon层未完成的wns请求量来动态变化。为了避免卡住node.js的主线程，目前只能选择runMode:beforeDate:的方式来启动RunLoop，确保只执行一次，以处理所有GCD分发到Main Queue的任务。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// WeiyunOCRunLoopContext.h</span></span><br><span class="line"><span class="keyword">enum</span> RunLoopFrequencyLevel &#123;</span><br><span class="line">    RunLoopFrequencyLevelLow = <span class="number">0</span>,</span><br><span class="line">    RunLoopFrequencyLevelMedium,</span><br><span class="line">    RunLoopFrequencyLevelHigh</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WeiyunOCRunLoopContext</span> &#123;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    WeiyunOCRunLoopContext();</span><br><span class="line">    ~WeiyunOCRunLoopContext();</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">updateRunLoopFrequencyLevel</span><span class="params">(RunLoopFrequencyLevel level)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">initRunLoopContext</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">delayForFrequencyLevel</span><span class="params">(RunLoopFrequencyLevel level)</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">std</span>::future&lt;<span class="keyword">bool</span>&gt; _future;</span><br><span class="line">    <span class="built_in">std</span>::mutex _mtx;</span><br><span class="line">    <span class="keyword">bool</span> _finish;</span><br><span class="line">    RunLoopFrequencyLevel _level;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;WeiyunV8TaskService&gt; _service;</span><br><span class="line">    <span class="keyword">static</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; _delays;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// WeiyunOCRunLoopContext.mm</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> DEFAULT_OC_RUNLOOP_DELAY_HIGH    100</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> DEFAULT_OC_RUNLOOP_DELAY_MEDIUM  300</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> DEFAULT_OC_RUNLOOP_DELAY_LOW     500</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;WeiyunV8TaskService&gt; WeiyunOCRunLoopContext::_service = <span class="built_in">std</span>::make_shared&lt;WeiyunV8TaskService&gt;();</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; WeiyunOCRunLoopContext::_delays = &#123; DEFAULT_OC_RUNLOOP_DELAY_LOW, DEFAULT_OC_RUNLOOP_DELAY_MEDIUM, DEFAULT_OC_RUNLOOP_DELAY_HIGH &#125;;</span><br><span class="line"></span><br><span class="line">WeiyunOCRunLoopContext::WeiyunOCRunLoopContext(): _finish(<span class="literal">false</span>), _level(RunLoopFrequencyLevelHigh) &#123;</span><br><span class="line">    <span class="keyword">this</span>-&gt;initRunLoopContext();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> WeiyunOCRunLoopContext::initRunLoopContext() &#123;</span><br><span class="line"></span><br><span class="line">    _future = <span class="built_in">std</span>::async(<span class="built_in">std</span>::launch::async, [<span class="keyword">this</span>]()&#123;</span><br><span class="line">        <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">            <span class="keyword">int</span> loopDelay = <span class="number">0</span>;</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="built_in">std</span>::unique_lock&lt;<span class="built_in">std</span>::mutex&gt; lock(<span class="keyword">this</span>-&gt;_mtx);</span><br><span class="line">                loopDelay = _delays[_level];</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="built_in">std</span>::this_thread::sleep_for(<span class="built_in">std</span>::chrono::milliseconds(loopDelay));</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="built_in">std</span>::unique_lock&lt;<span class="built_in">std</span>::mutex&gt; lock(<span class="keyword">this</span>-&gt;_mtx);</span><br><span class="line">                <span class="keyword">if</span> (<span class="keyword">this</span>-&gt;_finish) &#123;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            _service-&gt;defaultLoopAsync([]()&#123;</span><br><span class="line">                @autoreleasepool &#123;</span><br><span class="line">                    [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate date]];</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">WeiyunOCRunLoopContext::~WeiyunOCRunLoopContext() &#123;</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">std</span>::unique_lock&lt;<span class="built_in">std</span>::mutex&gt; lock(<span class="keyword">this</span>-&gt;_mtx);</span><br><span class="line">        <span class="keyword">this</span>-&gt;_finish = <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    _future.get();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> WeiyunOCRunLoopContext::updateRunLoopFrequencyLevel(RunLoopFrequencyLevel level) &#123;</span><br><span class="line">    <span class="built_in">std</span>::unique_lock&lt;<span class="built_in">std</span>::mutex&gt; lock(<span class="keyword">this</span>-&gt;_mtx);</span><br><span class="line">    <span class="keyword">this</span>-&gt;_level = level;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>​    这是我们首次尝试应用Electron实现桌面客户端并引入现有各种c++原生插件，部分方案难免存在缺陷，若有不足之处，恳请指出，谢谢。</p>
+<h3 id="相关链接"><a href="#相关链接" class="headerlink" title="相关链接"></a>相关链接</h3><p><a href="https://nodejs.org/dist/latest-v8.x/docs/api/addons.html" target="_blank" rel="noopener">https://nodejs.org/dist/latest-v8.x/docs/api/addons.html</a></p>
+<p><a href="https://v8.dev/docs" target="_blank" rel="noopener">https://v8.dev/docs</a></p>
+<p><a href="https://github.com/nodejs/nan" target="_blank" rel="noopener">https://github.com/nodejs/nan</a></p>
+<p><a href="http://jayconrod.com/posts/55/a-tour-of-v8-garbage-collection" target="_blank" rel="noopener">http://jayconrod.com/posts/55/a-tour-of-v8-garbage-collection</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/node-addon-electron-微云/" rel="tag"># node,addon,electron,微云</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/19/swift-functional/" rel="next" title="Swift函数式编程探索">
+                <i class="fa fa-chevron-left"></i> Swift函数式编程探索
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Weiyun Developer</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#NAN与v8"><span class="nav-number">1.</span> <span class="nav-text">NAN与v8</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Isolate"><span class="nav-number">1.1.</span> <span class="nav-text">Isolate</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Handle和HandleScope"><span class="nav-number">1.2.</span> <span class="nav-text">Handle和HandleScope</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Context"><span class="nav-number">1.3.</span> <span class="nav-text">Context</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分代垃圾回收Generational-GC"><span class="nav-number">2.</span> <span class="nav-text">分代垃圾回收Generational GC</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#新生代"><span class="nav-number">2.1.</span> <span class="nav-text">新生代</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#老生代"><span class="nav-number">2.2.</span> <span class="nav-text">老生代</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过libuv异步回调js主线程"><span class="nav-number">3.</span> <span class="nav-text">通过libuv异步回调js主线程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#异步js回调与Persistent-Handle"><span class="nav-number">4.</span> <span class="nav-text">异步js回调与Persistent Handle</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Local-Handle作为返回值"><span class="nav-number">5.</span> <span class="nav-text">Local Handle作为返回值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自定义数据结构的v8封装"><span class="nav-number">6.</span> <span class="nav-text">自定义数据结构的v8封装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Mac平台OC-RunLoop与uv-default-loop"><span class="nav-number">7.</span> <span class="nav-text">Mac平台OC RunLoop与uv_default_loop</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#相关链接"><span class="nav-number">8.</span> <span class="nav-text">相关链接</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Weiyun Developer</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

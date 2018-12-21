@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next mist" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="因为项目需要，在Mac系统上要实现一个能监控所有的文件读写的应用，并且可以阻塞或者拒绝一些特定的文件操作。 在Window上可以通过文件系统过滤驱动来做，而且网上资料也挺多。Mac平台上则需要通过内核扩展（KEXT）来做，相关的资料相对就少很多了，而且大部分是英文的，过程也中踩了一些坑。 就准备把流程在这篇文章里记录一下。 准备测试机不管是Window还是Mac，估计Linux也一样，内核相关的开">
+<meta name="keywords" content="mac,kernel,内核">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mac内核扩展开发">
+<meta property="og:url" content="https://iweiyun.github.io/2018/12/21/mac-kernel-dev/index.html">
+<meta property="og:site_name" content="微云iOS团队">
+<meta property="og:description" content="因为项目需要，在Mac系统上要实现一个能监控所有的文件读写的应用，并且可以阻塞或者拒绝一些特定的文件操作。 在Window上可以通过文件系统过滤驱动来做，而且网上资料也挺多。Mac平台上则需要通过内核扩展（KEXT）来做，相关的资料相对就少很多了，而且大部分是英文的，过程也中踩了一些坑。 就准备把流程在这篇文章里记录一下。 准备测试机不管是Window还是Mac，估计Linux也一样，内核相关的开">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://iweiyun.github.io/images/mac-kernel/1545314322_42.png">
+<meta property="og:image" content="https://iweiyun.github.io/images/mac-kernel/1545314915_27.png">
+<meta property="og:image" content="https://iweiyun.github.io/images/mac-kernel/1545318719_59.png">
+<meta property="og:image" content="https://iweiyun.github.io/images/mac-kernel/1545319704_63.png">
+<meta property="og:image" content="https://iweiyun.github.io/images/mac-kernel/1545321624_58.png">
+<meta property="og:image" content="https://iweiyun.github.io/images/mac-kernel/1545324557_74.png">
+<meta property="og:image" content="https://iweiyun.github.io/images/mac-kernel/1545324957_2.png">
+<meta property="og:image" content="https://iweiyun.github.io/images/mac-kernel/1545325071_45.png">
+<meta property="og:image" content="https://iweiyun.github.io/images/mac-kernel/1545325185_40.png">
+<meta property="og:image" content="https://iweiyun.github.io/images/mac-kernel/1545326692_63.png">
+<meta property="og:image" content="https://iweiyun.github.io/images/mac-kernel/1545327326_80.png">
+<meta property="og:image" content="https://iweiyun.github.io/images/mac-kernel/1545327390_10.png">
+<meta property="og:image" content="https://iweiyun.github.io/images/mac-kernel/1545328422_27.png">
+<meta property="og:updated_time" content="2018-12-21T04:40:27.995Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Mac内核扩展开发">
+<meta name="twitter:description" content="因为项目需要，在Mac系统上要实现一个能监控所有的文件读写的应用，并且可以阻塞或者拒绝一些特定的文件操作。 在Window上可以通过文件系统过滤驱动来做，而且网上资料也挺多。Mac平台上则需要通过内核扩展（KEXT）来做，相关的资料相对就少很多了，而且大部分是英文的，过程也中踩了一些坑。 就准备把流程在这篇文章里记录一下。 准备测试机不管是Window还是Mac，估计Linux也一样，内核相关的开">
+<meta name="twitter:image" content="https://iweiyun.github.io/images/mac-kernel/1545314322_42.png">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="微云iOS团队" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="https://iweiyun.github.io/2018/12/21/mac-kernel-dev/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Mac内核扩展开发 | 微云iOS团队</title>
+  
+
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?75b2f2884a5033937b5cfdebf2ebce39";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">微云iOS团队</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://iweiyun.github.io/2018/12/21/mac-kernel-dev/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Weiyun Developer">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="微云iOS团队">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Mac内核扩展开发
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2018-12-21 12:31:55 / Modified: 12:40:27" itemprop="dateCreated datePublished" datetime="2018-12-21T12:31:55+08:00">2018-12-21</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          <span> ｜ </span>
+          <span class="fa fa-user-o"> </span>
+          <span style="color:#222;"> sniper</span>
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>因为项目需要，在Mac系统上要实现一个能监控所有的文件读写的应用，并且可以阻塞或者拒绝一些特定的文件操作。</p>
+<p>在Window上可以通过文件系统过滤驱动来做，而且网上资料也挺多。<br>Mac平台上则需要通过内核扩展（KEXT）来做，相关的资料相对就少很多了，而且大部分是英文的，过程也中踩了一些坑。</p>
+<p>就准备把流程在这篇文章里记录一下。</p>
+<h3 id="准备测试机"><a href="#准备测试机" class="headerlink" title="准备测试机"></a>准备测试机</h3><p>不管是Window还是Mac，估计Linux也一样，内核相关的开发是需要两台机器的。一台机器用于开发，一台机器专门用于测试编译出来的kext。</p>
+<p>原因之一是方便，内核中如果出现空指针啊之类的错误的话，是会导致kernel panic，就只能重启系统了。普通的逻辑bug放到内核里也可能导致整个系统都不能正常运作，总之重启是家常便饭。这时两台机器分工能大大提高开发效率的。</p>
+<p>原因之二是内核调试必须要使用两台机器。估计是因为内核断点下来之后，应用层的UI、调试器之类的程序也都暂停了。所以只能用另外的机器进行远程调试。</p>
+<hr>
+<p>实际操作中通常是使用虚拟机，成本低，有快照支持，非常适合用来当测试用机。<br>虚拟化软件推荐直接使用VMware Fusion，最开始我使用的Virtual Box，想着是免费开源的，然而踩了几天坑之后，发现VBox对MacOS支持的并不好。</p>
+<p>首先要创建安装系统用的iso：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">hdiutil create -o /tmp/HighSierra -size 8G -layout SPUD -fs HFS+J -type SPARSE</span><br><span class="line">hdiutil attach /tmp/HighSierra.sparseimage -noverify -mountpoint /Volumes/install_build</span><br><span class="line">sudo /Applications/Install\ macOS\ High\ Sierra.app/Contents/Resources/createinstallmedia --volume /Volumes/install_build</span><br><span class="line">hdiutil detach /Volumes/Install\ macOS\ High\ Sierra/</span><br><span class="line">hdiutil convert /tmp/HighSierra.sparseimage -format UDTO -o /tmp/HighSierra.iso</span><br></pre></td></tr></table></figure>
+<p>第三行中的.app可以直接从App Store上下载，不同系统版本路径会稍有变化。<br><img src="/images/mac-kernel/1545314322_42.png" alt="系统安装文件下载"><br>其他的命令是创建磁盘镜像，挂载，卸载，转换为iso格式，具体可以参考hdiutil的man文档。</p>
+<hr>
+<p>然后就是新建虚拟机，把刚刚创建的iso装载到虚拟机光驱里，启动，安装就行了。没有什么需要特别设置的。<br>（VBox在安装过程中的第一次重启，不能引导正确的分区，需要进boot manager手动选择）</p>
+<p><img src="/images/mac-kernel/1545314915_27.png" alt="网卡设置"></p>
+<p>值得一提的是网卡这边可以设成host-only，这样就可以用虚拟机的ip直接访问它。但是虚拟机不能访问外网，不过也没必要访问外网。</p>
+<p><img src="/images/mac-kernel/1545318719_59.png" alt="文件共享"></p>
+<p>通过打开虚拟机Mac自带的文件共享来传输文件，VMware自带的文件拖放不太好用。</p>
+<h3 id="配置调试环境"><a href="#配置调试环境" class="headerlink" title="配置调试环境"></a>配置调试环境</h3><p>首先要给虚拟机安装上内核调试套件Kernel Debug Kit，这里面包含了Debug版的内核和驱动，以及相应的符号文件，可以从苹果的<a href="https://developer.apple.com/download/more/" title="下载地址" target="_blank" rel="noopener">开发者中心</a>下载。</p>
+<p><img src="/images/mac-kernel/1545319704_63.png" alt="KDK下载"></p>
+<p>注意版本号要与虚拟机里装的MacOS完全一致！</p>
+<p>KDK的安装路径是/Library/Developer/KDKs，其中有一个官方的readme文件，KDK的使用方法，Debug方法基本都包含了，是非常有用的资料。</p>
+<hr>
+<p>在虚拟机里完成KDK的安装后，需要设置启动参数，VMware里就跟真机一样设置就好了：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo nvram boot-args="-v debug=0x146 kdp_match_name=en0 kcsuffix=development"</span><br></pre></td></tr></table></figure>
+<ul>
+<li>-v：输出所有内核日志，启动时也会输出到黑屏幕</li>
+<li>debug：内核调试的关键设置，具体可以参考苹果官方文档<a href="https://developer.apple.com/library/archive/documentation/Darwin/Conceptual/KernelProgramming/build/build.html" title="Building and Debugging Kernels" target="_blank" rel="noopener">Building and Debugging Kernels</a>里的Debugging flags</li>
+</ul>
+<p><img src="/images/mac-kernel/1545321624_58.png" alt="Debugging flags"></p>
+<ul>
+<li>kcsuffix：指定使用的内核，这里因为只是debug我们开发的kext，而不是内核本身，使用development的内核就可以了，性能会比较好。</li>
+<li>kdp_match_name：指定断点时用哪个网卡进行远程调试</li>
+</ul>
+<p>这里特别提一下kdp_match_name这个选项，网上的教程大部分都没有这个选项。但是我最开始用VBox来远程调试的时候，死活都连不上，卡了很久，最后在前面提到的官方readme里找到了这个选项才解决。因为当时设置了两个网卡，除了host-only，还有一个NAT连外网，系统默认用了NAT的网卡来调试，当然就没办法连上了。<br>（VBox对nvram的支持非常差，直接用nvram命令设置是无效的，要用命令：VBoxManage setextradata 虚拟机名 “VBoxInternal2/EfiBootArgs” “-v debug=0x146 kdp_match_name=en0 kcsuffix=development”）<br>（后面关闭SIP的设置没法保存也是同理，必须每次启动都操作一次）</p>
+<hr>
+<p>接下来要做的是替换development内核，但在此之前要先关闭SIP（System Integrity Protection），因为内核是受SIP保护的，而且后面要加载未签名的KEXT也是需要在SIP关闭的情况下。</p>
+<ol>
+<li>重启，并按住Cmd+R进恢复模式<br>（VBox因为没有没有启动前的BIOS画面？所以也只能通过boot manager进恢复模式）</li>
+<li>在恢复模式的终端里执行csrutil disable</li>
+</ol>
+<p>关闭了SIP后，重启，替换一下开发内核：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo cp /Library/Developer/KDKs/KDK_10.14_18A391.kdk/System/Library/Kernels/kernel.development /System/Library/Kernels/kernel</span><br><span class="line">sudo kextcache -invalidate /</span><br><span class="line">sudo reboot</span><br></pre></td></tr></table></figure>
+<p>后两句是清除内核缓存并且重启。<br>到此调试环境就算是配置完成了。</p>
+<h3 id="KEXT开发调试"><a href="#KEXT开发调试" class="headerlink" title="KEXT开发调试"></a>KEXT开发调试</h3><p>先来测试下远程调试是否OK。<br>因为前面设置了0x04这个debug标记，可以通过按键触发NMI （non-maskable interrupt）来进入调试状态。因为要按的键太多了，设置个映射比较方便。<br><img src="/images/mac-kernel/1545324557_74.png" alt="按键映射"></p>
+<p>按完之后如果虚拟机整个卡住了，那就说明进入调试状态了。</p>
+<p>在开发机上也装上KDK，因为需要符号和内核调试用的lldb脚本。之后运行lldb进行调试：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lldb /Library/Developer/KDKs/KDK_10.14_18A391.kdk/System/Library/Kernels/kernel.development</span><br></pre></td></tr></table></figure>
+<p>按提示导入脚本：<br><img src="/images/mac-kernel/1545324957_2.png" alt="导入脚本"><br>也可以按提示设置一下自动导入，下次进来就不用再敲导入命令了。</p>
+<p>用ip连接虚拟机进行调试：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kdp-remote 192.168.19.128</span><br></pre></td></tr></table></figure>
+<p><img src="/images/mac-kernel/1545325071_45.png" alt="kdp-remote"><br>剩下的就跟lldb调试普通应用差不多了，例如bt命令打印堆栈等等，这里就不展开了，大家可以单独去学习。<br><img src="/images/mac-kernel/1545325185_40.png" alt="bt"></p>
+<p>kext执行在内核中，调试也是差不多的。当你的kext引发了panic时，会自动断下来，此时用lldb连上去就能看到堆栈了。<br>也可以在lldb中下断点，或使用int3主动断下来。</p>
+<hr>
+<p>最后我们来实现最开始说的文件读写监控的功能。</p>
+<p>Google了一阵之后，发现苹果在10.4引入的Kauth（Kernel Authorization）相关KPI（Kernel Programming Interface），正好符合我们的要求。</p>
+<p>Kauth里的Vnode Scope，会回调所有的文件系统操作给KEXT中注册的回调函数，包括读写、执行、删除等，并且可以由KEXT决定是否拒绝访问。</p>
+<p>具体细节可以参考<a href="https://developer.apple.com/library/archive/technotes/tn2127/_index.html" title="官方文档" target="_blank" rel="noopener">官方文档</a>，同时还提供了一个<a href="https://developer.apple.com/library/archive/samplecode/KauthORama/Introduction/Intro.html#//apple_ref/doc/uid/DTS10003633" title="示例代码" target="_blank" rel="noopener">示例代码</a>，可以说是非常贴心了。虽然这些资料都有些年头了，但是完全没有过时。</p>
+<p>接下来直接看代码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">extern</span> kern_return_t <span class="title">com_example_apple_samplecode_kext_KauthORama_start</span><span class="params">(<span class="keyword">kmod_info_t</span> * ki, <span class="keyword">void</span> * d)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">extern</span> kern_return_t <span class="title">com_example_apple_samplecode_kext_KauthORama_stop</span><span class="params">(<span class="keyword">kmod_info_t</span> * ki, <span class="keyword">void</span> * d)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>这是入口函数，在kext加载或卸载时执行，可以在工程设置中指定：<br><img src="/images/mac-kernel/1545326692_63.png" alt="入口函数"><br>然后是注册回调函数，以及回调的部分实现：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">InstallVnodeListener</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    gListener = kauth_listen_scope(KAUTH_SCOPE_VNODE, VnodeScopeListener, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">if</span> (gListener == <span class="literal">NULL</span> ) &#123;</span><br><span class="line">        RemoveVnodeListener();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">VnodeScopeListener</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">kauth_cred_t</span>    credential,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">void</span> *          idata,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">kauth_action_t</span>  action,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">uintptr_t</span>       arg0,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">uintptr_t</span>       arg1,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">uintptr_t</span>       arg2,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">uintptr_t</span>       arg3    <span class="comment">// type (int *), is errPtr, if denies, indicate the error to return to the client.</span></span></span></span><br><span class="line"><span class="function"><span class="params">)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> ret = KAUTH_RESULT_DEFER;</span><br><span class="line"></span><br><span class="line">    atomic_fetch_add(&amp;gActivationCount, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> err;</span><br><span class="line">    <span class="keyword">vnode_t</span> vp = (<span class="keyword">vnode_t</span>)arg1;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> tag = vnode_tag(vp);</span><br><span class="line">    <span class="keyword">if</span> (tag != VT_HFS &amp;&amp; tag != VT_APFS) &#123;</span><br><span class="line">        atomic_fetch_sub(&amp;gActivationCount, <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">return</span> ret;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span> * vpPath;</span><br><span class="line">    err = createVnodePath(vp, &amp;vpPath);</span><br></pre></td></tr></table></figure>
+<p>更具体的代码就先略过了，可以参考官方文档和示例。除此之外还有用sysctl控制kext的方法，这个示例代码里就有。以及跟用户层进行类socket通信的<a href="https://developer.apple.com/library/archive/documentation/Darwin/Conceptual/NKEConceptual/control/control.html" title="KEXT Controls" target="_blank" rel="noopener">KEXT Controls</a> KPI。</p>
+<hr>
+<p>代码写好之后，先编译出来，然后要在plist里配置一下依赖库，用kextlibs命令来查询用到了那些库：<br><img src="/images/mac-kernel/1545327326_80.png" alt="kextlibs"><br>填到plist的OSBundleLibraries项里：<br><img src="/images/mac-kernel/1545327390_10.png" alt="plist"><br>重新编译一下就可以加载了，不加这些的话，在加载时就会出现找不到符号的错误。</p>
+<hr>
+<p>在虚拟机上执行以下命令加载kext：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chown -R root:wheel KauthORama.kext; kextload KauthORama.kext</span><br></pre></td></tr></table></figure>
+<p>必须以root用户运行，我是先用了sudo -i进了root shell的，就不用每次都sudo了。chown的原因也是因为kextload的限制，要求kext文件的owner是root。</p>
+<p>之后就可以通过log命令来查看kext里print出来的读写请求了：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">log show --last=3m --predicate 'sender == "KauthORama"'</span><br></pre></td></tr></table></figure>
+<p>效果如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Filtering the log data using "sender == "KauthORama""</span><br><span class="line">Skipping info and debug messages, pass --info and/or --debug to include.</span><br><span class="line">Timestamp                       Thread     Type        Activity             PID    TTL  </span><br><span class="line">2018-12-21 01:44:41.308911+0800 0x3722     Default     0x0                  0      0    kernel.development: (KauthORama) action=LIST_DIRECTORY|ACCESS, uid=501, vp=/Users/zouquan/Desktop/KauthTest, dvp=&lt;null&gt;, pid=271, pname=Finder</span><br><span class="line">2018-12-21 01:44:41.308917+0800 0x3722     Default     0x0                  0      0    kernel.development: (KauthORama) action=SEARCH|ACCESS, uid=501, vp=/Users/zouquan/Desktop/KauthTest, dvp=&lt;null&gt;, pid=271, pname=Finder</span><br><span class="line">2018-12-21 01:44:41.309565+0800 0x3706     Default     0x0                  0      0    kernel.development: (KauthORama) action=READ_ATTRIBUTES|READ_SECURITY, uid=501, vp=/Users/zouquan/Desktop/KauthTest, dvp=&lt;null&gt;, pid=65, pname=mds</span><br><span class="line">2018-12-21 01:44:41.309676+0800 0x3706     Default     0x0                  0      0    kernel.development: (KauthORama) action=READ_ATTRIBUTES, uid=501, vp=/Users/zouquan/Desktop/KauthTest, dvp=&lt;null&gt;, pid=65, pname=mds</span><br><span class="line">2018-12-21 01:44:41.309697+0800 0x3706     Default     0x0                  0      0    kernel.development: (KauthORama) action=LIST_DIRECTORY, uid=501, vp=/Users/zouquan/Desktop/KauthTest, dvp=&lt;null&gt;, pid=65, pname=mds</span><br><span class="line">--------------------------------------------------------------------------------------------------------------------</span><br><span class="line">Log      - Default:          5, Info:                0, Debug:             0, Error:          0, Fault:          0</span><br><span class="line">Activity - Create:           0, Transition:          0, Actions:           0</span><br></pre></td></tr></table></figure>
+<p>当然也可以用控制台APP来查看，效果是一样的：<br><img src="/images/mac-kernel/1545328422_27.png" alt="控制台"></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/mac-kernel-内核/" rel="tag"># mac,kernel,内核</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/19/swift-functional/" rel="next" title="Swift函数式编程探索">
+                <i class="fa fa-chevron-left"></i> Swift函数式编程探索
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Weiyun Developer</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#准备测试机"><span class="nav-number">1.</span> <span class="nav-text">准备测试机</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置调试环境"><span class="nav-number">2.</span> <span class="nav-text">配置调试环境</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#KEXT开发调试"><span class="nav-number">3.</span> <span class="nav-text">KEXT开发调试</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Weiyun Developer</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
