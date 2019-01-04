@@ -114,7 +114,7 @@
 <meta property="og:site_name" content="微云iOS团队">
 <meta property="og:description" content="近期项目中尝试使用Electron来实现跨平台桌面客户端。由于Node.js支持c++实现native addon，将c++接口封装供js调用，我们考虑将已经被多平台使用的SDK作为native扩展库引入Electron工程。 Node.js有两套API可以供c++侧选择来实现v8接口的封装，NAN和N-API。NAN是受到广泛认可（包括Node官方）的三方接口层，内部兼容各种Node版本v8接口">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-01-04T03:50:53.725Z">
+<meta property="og:updated_time" content="2019-01-04T03:55:11.384Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Node.js C++ Addon应用实践">
 <meta name="twitter:description" content="近期项目中尝试使用Electron来实现跨平台桌面客户端。由于Node.js支持c++实现native addon，将c++接口封装供js调用，我们考虑将已经被多平台使用的SDK作为native扩展库引入Electron工程。 Node.js有两套API可以供c++侧选择来实现v8接口的封装，NAN和N-API。NAN是受到广泛认可（包括Node官方）的三方接口层，内部兼容各种Node版本v8接口">
@@ -335,7 +335,7 @@
                 
               
 
-              <time title="Created: 2019-01-04 11:24:43 / Modified: 11:50:53" itemprop="dateCreated datePublished" datetime="2019-01-04T11:24:43+08:00">2019-01-04</time>
+              <time title="Created: 2019-01-04 11:24:43 / Modified: 11:55:11" itemprop="dateCreated datePublished" datetime="2019-01-04T11:24:43+08:00">2019-01-04</time>
             
 
             
@@ -383,7 +383,7 @@
 <hr>
 <h3 id="c-addon的本质"><a href="#c-addon的本质" class="headerlink" title="c++ addon的本质"></a>c++ addon的本质</h3><p>在编写自己的addon模块之前，可以随便拿一个.node文件来探查一下它的本质究竟是什么。直接查看一个.node文件的二进制数据，结果如下</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CFFAEDFE 07000001 03000000 08000000 0D000000 30070000 85800100 00000000 19000000 C8020000 5F5F5445 58540000 00000000 00000000 00000000 00000000 00D01D00 00000000 00000000 00000000 00D01D00 00000000 07000000 05000000 08000000 ...</span><br></pre></td></tr></table></figure>
-<p>可以看到文件头标识有0xCFFAEDFE，根据<a href="https://opensource.apple.com/source/xnu/xnu-792/EXTERNAL_HEADERS/mach-o/loader.h头文件中的定义" target="_blank" rel="noopener">https://opensource.apple.com/source/xnu/xnu-792/EXTERNAL_HEADERS/mach-o/loader.h头文件中的定义</a></p>
+<p>可以看到文件头标识有0xCFFAEDFE，根据 <a href="https://opensource.apple.com/source/xnu/xnu-792/EXTERNAL_HEADERS/mach-o/loader.h" target="_blank" rel="noopener">https://opensource.apple.com/source/xnu/xnu-792/EXTERNAL_HEADERS/mach-o/loader.h</a> 头文件中的定义</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Constant for the magic field of the mach_header_64 (64-bit architectures) */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MH_MAGIC_64	0xfeedfacf	<span class="comment">/* the 64-bit mach magic number */</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MH_CIGAM_64	NXSwapInt(MH_MAGIC_64)   <span class="comment">//0xcffaedfe （little-endian）</span></span></span><br></pre></td></tr></table></figure>
 <p>这串标识是苹果Mach-O文件在64位机器上的魔数，表明.node文件在mac平台上是一个Mach-O文件，我们可以通过lipo/otool/nm等工具对其结构进行查看。</p>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ otool -hv DemoSDK.node</span><br><span class="line">Mach header</span><br><span class="line">      magic cputype cpusubtype  caps    filetype ncmds sizeofcmds      flags</span><br><span class="line">MH_MAGIC_64  X86_64        ALL  0x00      BUNDLE    23       4088   NOUNDEFS DYLDLINK TWOLEVEL WEAK_DEFINES BINDS_TO_WEAK</span><br></pre></td></tr></table></figure>
@@ -418,7 +418,7 @@
 <p>“libraries”：指定需要链接的库，对于.a、.dylib这类非bundle结构形式的链接库，直接设置相对路径即可；对于具有完整bundle目录结构的framework，则可以通过”-F ‘Framework Path’ -framework ‘Framework Name’ “的方式来找到</p>
 <p>“conditions”：允许你设置各种判断条件，它其实可以出现在整个.gyp文件的任何地方，并且当.gyp文件被加载后就会优先对内部的条件语句进行处理。这里主要用于区分系统平台，以便根据平台分别对xcode和vs进行相关设定</p>
 <p>“configurations”：分别可以对debug版本和release版本进行编译选项的设定</p>
-<p>其他gyp配置文件的具体格式可以参考gyp的官方文档： <a href="https://gyp.gsrc.io/docs/UserDocumentation.md，不过很多找不到的还请努力谷歌。" target="_blank" rel="noopener">https://gyp.gsrc.io/docs/UserDocumentation.md，不过很多找不到的还请努力谷歌。</a></p>
+<p>其他gyp配置文件的具体格式可以参考gyp的官方文档： <a href="https://gyp.gsrc.io/docs/UserDocumentation.md" target="_blank" rel="noopener">https://gyp.gsrc.io/docs/UserDocumentation.md</a> ，不过很多找不到的还请努力谷歌。</p>
 <p>​    </p>
 <hr>
 <h3 id="c-addon的编写"><a href="#c-addon的编写" class="headerlink" title="c++ addon的编写"></a>c++ addon的编写</h3><h4 id="NAN的使用"><a href="#NAN的使用" class="headerlink" title="NAN的使用"></a>NAN的使用</h4><p>先来说说NAN的方式编写addon。NAN的引入十分方便，根据nan的官方文档，只需要通过npm在工程目录下安装即可</p>
